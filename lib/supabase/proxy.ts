@@ -37,14 +37,22 @@ export async function updateSession(request: NextRequest) {
 
   const user = data?.claims
 
+  // prevent redirect on specific routes
+  const publicPaths = [
+    '/',         
+  ]
+
+  const isPublicPath = publicPaths.includes(request.nextUrl.pathname)
+
   if (
     !user &&
+    !isPublicPath &&
     !request.nextUrl.pathname.startsWith('/login') &&
     !request.nextUrl.pathname.startsWith('/auth')
   ) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone()
-    url.pathname = '/login'
+    url.pathname = '/auth/login'
     return NextResponse.redirect(url)
   }
 
