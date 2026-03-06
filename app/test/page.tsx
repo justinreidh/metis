@@ -1,3 +1,5 @@
+'use client'
+
 import { useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { QUESTIONS as PersonalityQuestions, calculateTraitScores, LIKERT_OPTIONS, LikertValue, BigFiveTrait } from '@/lib/questions/personality';

@@ -88,7 +88,15 @@ export default function Dashboard() {
     }
 
     const link = `${window.location.origin}/test?token=${data.token}`
-    alert(`Link: ${link}\n\n(TODO: send this via email)`)
+    try {
+      await navigator.clipboard.writeText(link)
+      alert(`Link copied to clipboard!\n\n${link}`)
+      // Optional: you can later replace alert with a toast / UI feedback
+    } catch (err) {
+      console.error('Failed to copy:', err)
+      // Fallback: still show the link so user can manually copy
+      alert(`Could not copy automatically (browser may block it).\n\nLink:\n${link}\n\nPlease copy it manually.`)
+    }
     // In production: call a server action or API route to email it securely
   }
 
