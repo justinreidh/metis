@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { QUESTIONS as PersonalityQuestions, calculateTraitScores, LIKERT_OPTIONS, LikertValue, BigFiveTrait } from '@/lib/questions/personality';
 import { questions as GCAQuestions } from '@/lib/questions/gca';
 import { createClient } from '@/lib/supabase/client';
+import GCATest from '../components/GCATest'
 // Import calculateTraitScores
 
 export default function Test() {
@@ -32,11 +33,13 @@ export default function Test() {
 
   if (!candidate) return <div>Loading...</div>;
 
+  const handleGcaComplete = (responses: Record<number, number>) => {
+    setGcaResponses(responses)
+    setCurrentTest('personality')
+  }
+
   const handleSubmit = async () => {
-    if (currentTest === 'gca') {
-      setCurrentTest('personality');
-      return;
-    }
+    
 
     // Save responses
     await supabase.from('responses').insert([
@@ -88,21 +91,7 @@ export default function Test() {
   return (
     <div>
       {currentTest === 'gca' && (
-        <div>
-          <h1>GCA Test</h1>
-          {GCAQuestions.map(q => (
-            <div key={q.id}>
-              <p>{q.question}</p>
-              {q.options.map((opt, idx) => (
-                <label key={idx}>
-                  <input type="radio" name={`q${q.id}`} onChange={() => setGcaResponses({ ...gcaResponses, [q.id]: idx })} />
-                  {opt}
-                </label>
-              ))}
-            </div>
-          ))}
-          <button onClick={handleSubmit}>Next</button>
-        </div>
+        <GCATest onComplete={handleGcaComplete} />
       )}
       {currentTest === 'personality' && (
         <div>
