@@ -7,6 +7,16 @@ import { questions as GCAQuestions } from '@/lib/questions/gca'
 import { createClient } from '@/lib/supabase/client'
 import GCATest from '../components/GCATest'
 import PersonalityTest from '../components/PersonalityTest'   // ← new import
+import Introduction from '../components/Introduction'
+import TestInstructions from '../components/TestInstructions'
+
+type TestPhase = 
+  | 'intro' 
+  | 'gca-instructions' 
+  | 'gca' 
+  | 'personality-instructions' 
+  | 'personality' 
+  | 'done';
 
 export default function Test() {
   const params = useSearchParams()
@@ -15,6 +25,7 @@ export default function Test() {
   const [currentTest, setCurrentTest] = useState<'gca' | 'personality' | 'done'>('gca')
   const [gcaResponses, setGcaResponses] = useState<Record<number, number>>({})
   const [personalityResponses, setPersonalityResponses] = useState<Record<number, number>>({})
+  const [phase, setPhase] = useState<TestPhase>('intro');
 
   const supabase = createClient()
 
@@ -34,21 +45,25 @@ export default function Test() {
 
       setCandidate(data)
       await supabase.from('candidates').update({ status: 'in_progress' }).eq('id', data.id)
+      setPhase('intro');
     }
     validateToken()
   }, [token, supabase])
 
   if (!candidate) return <div>Loading...</div>
 
+  const handleStartGCA = () => setPhase('gca');
   const handleGcaComplete = (responses: Record<number, number>) => {
     setGcaResponses(responses)
-    setCurrentTest('personality')
+    setPhase('personality-instructions');
   }
 
+  const handleStartPersonality = () => setPhase('personality');
   const handlePersonalityComplete = (responses: Record<number, number>) => {
     setPersonalityResponses(responses)
     // Immediately proceed to save & finish (no extra button needed in parent)
     handleFinalSubmit(responses)
+    setPhase('done')
   }
 
   const handleFinalSubmit = async (personalityRes: Record<number, number> = personalityResponses) => {
@@ -107,18 +122,56 @@ export default function Test() {
   }
 
   return (
-    <div>
-      {currentTest === 'gca' && <GCATest onComplete={handleGcaComplete} />}
+    <div style={{ minHeight: '100vh', padding: '2rem', maxWidth: '900px', margin: '0 auto' }}>
+      {phase === 'intro' && <Introduction onBegin={() => setPhase('gca-instructions')} />}
 
-      {currentTest === 'personality' && (
-        <PersonalityTest onComplete={handlePersonalityComplete} />
+      {phase === 'gca-instructions' && (
+        <TestInstructions 
+          title="General Cognitive Ability (GCA) Test"
+          instructions={`
+            <p>This test measures your general reasoning, problem-solving, and critical thinking skills.</p>
+            <ul>
+              <li>You will have <strong>7 minutes and 30 seconds</strong> to complete all questions.</li>
+              <li>Each question has multiple-choice options — select the one you believe is correct.</li>
+              <li>The test is timed and will auto-submit when time runs out.</li>
+              <li>Answer as quickly and accurately as possible — there is no penalty for guessing.</li>
+              <li>Once you begin, you cannot pause the timer.</li>
+            </ul>
+            <p style="margin-top: 1.5rem; font-weight: bold;">When you're ready, click "Begin GCA Test".</p>
+          `}
+          buttonText="Begin GCA Test"
+          onStart={handleStartGCA}
+        />
       )}
 
-      {currentTest === 'done' && (
+      {phase === 'gca' && <GCATest onComplete={handleGcaComplete} />}
+
+      {phase === 'personality-instructions' && (
+        <TestInstructions 
+          title="Personality Assessment"
+          instructions={`
+            <p>This section assesses your typical ways of thinking, feeling, and behaving using the Big Five model.</p>
+            <ul>
+              <li>You will see a series of statements. For each one, indicate how accurately it describes you.</li>
+              <li>There are no right or wrong answers — answer honestly based on how you generally are.</li>
+              <li>The test is untimed — take as long as you need to read each statement carefully.</li>
+              <li>All questions must be answered to submit.</li>
+            </ul>
+            <p style="margin-top: 1.5rem; font-weight: bold;">When you're ready, click "Begin Personality Assessment".</p>
+          `}
+          buttonText="Begin Personality Assessment"
+          onStart={handleStartPersonality}
+        />
+      )}
+
+      {phase === 'personality' && <PersonalityTest onComplete={handlePersonalityComplete} />}
+
+      {phase === 'done' && (
         <div style={{ textAlign: 'center', padding: '4rem 1rem' }}>
-          <h1>Thank you!</h1>
+          <h1>Thank You!</h1>
           <p style={{ fontSize: '1.3rem', marginTop: '1.5rem' }}>
-            Your assessment is complete. Results have been recorded.
+            Your assessment is now complete.<br/>
+            Results have been recorded and will be reviewed shortly.
           </p>
         </div>
       )}
