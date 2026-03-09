@@ -22,7 +22,6 @@ export default function GCATest({ onComplete }: Props) {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timerRef.current!)
-          handleAutoSubmit()
           return 0
         }
         return prev - 1
@@ -33,6 +32,13 @@ export default function GCATest({ onComplete }: Props) {
       if (timerRef.current) clearInterval(timerRef.current)
     }
   }, [])
+
+  useEffect(() => {
+  if (timeLeft === 0) {
+    // Now this runs *after* render is complete
+    handleAutoSubmit()
+  }
+}, [timeLeft])
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
