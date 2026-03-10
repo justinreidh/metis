@@ -3,6 +3,14 @@
 import { createClient } from '@/lib/supabase/client'  // ← browser client
 import { useEffect, useState, FormEvent } from 'react'
 
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
+
 export default function Dashboard() {
   const [candidates, setCandidates] = useState<any[]>([]) // TODO: replace 'any' with your Candidate type
   const [loading, setLoading] = useState(true)
@@ -100,30 +108,86 @@ export default function Dashboard() {
     // In production: call a server action or API route to email it securely
   }
 
-  if (loading) return <div>Loading candidates...</div>
-  if (error) return <div>Error: {error}</div>
+  if (loading) return <div className="flex items-center justify-center min-h-screen">Loading candidates...</div>
+  if (error) {
+    return (
+      <div className="max-w-4xl mx-auto p-6">
+        <Alert variant="destructive">
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      </div>
+    )
+  }
 
   return (
-    <div>
-      <h1>Dashboard</h1>
+    <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          <p className="text-muted-foreground">Manage your candidates and assessments</p>
+        </div>
+        {/* Add avatar / user menu later */}
+      </div>
 
-      <ul>
-        <form onSubmit={handleAddCandidate}>
-            <input name="name" placeholder="Candidate Name" required />
-            <input name="email" type="email" placeholder="Candidate Email" required />
-            <button type="submit">Add Candidate</button>
-        </form>
-        <h1>Candidates</h1>
-        {candidates.map((c) => (
-          <li key={c.id}>
-            {c.name} - Status: {c.status || 'N/A'}
-            <button onClick={() => generateLink(c.id)}>Send Link</button>
-            <a href={`/candidate/${c.id}`}>View Results</a>
-          </li>
-        ))}
-      </ul>
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Add New Candidate</CardTitle>
+          <CardDescription>Enter candidate details to invite them to an assessment.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleAddCandidate} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Name</Label>
+                <Input id="name" placeholder="Candidate Name" required />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" placeholder="candidate@example.com" required />
+              </div>
+            </div>
+            <Button type="submit">Add Candidate</Button>
+          </form>
+        </CardContent>
+      </Card>
 
-      
+      <Card>
+        <CardHeader>
+          <CardTitle>Candidates</CardTitle>
+          <CardDescription>Current assessment candidates ({candidates.length})</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {candidates.length === 0 ? (
+            <p className="text-muted-foreground text-center py-8">No candidates yet. Add one above.</p>
+          ) : (
+            <div className="space-y-4">
+              {candidates.map((c) => (
+                <div
+                  key={c.id}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                >
+                  <div>
+                    <div className="font-medium">{c.name}</div>
+                    <div className="text-sm text-muted-foreground">{c.email}</div>
+                  </div>
+                  <div className="flex items-center gap-3 mt-3 sm:mt-0">
+                    <Badge variant={c.status === 'completed' ? 'default' : 'secondary'}>
+                      {c.status || 'Pending'}
+                    </Badge>
+                    <Button variant="outline" size="sm" onClick={() => generateLink(c.id)}>
+                      Send Link
+                    </Button>
+                    <Button variant="ghost" size="sm" asChild>
+                      <a href={`/candidate/${c.id}`}>View Results</a>
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }
