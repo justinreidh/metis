@@ -176,7 +176,7 @@ export default function Dashboard() {
                       {c.status || 'Pending'}
                     </Badge>
                     <Button variant="outline" size="sm" onClick={() => generateLink(c.id)}>
-                      Send Link
+                      Copy Assessment Link
                     </Button>
                     <Button variant="ghost" size="sm" asChild>
                       <a href={`/candidate/${c.id}`}>View Results</a>

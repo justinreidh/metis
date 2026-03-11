@@ -38,8 +38,13 @@ export default function Test() {
         .eq('token', token)
         .single()
 
-      if (error || !data || new Date(data.token_expires) < new Date()) {
-        alert('Invalid or expired link')
+      if (error || !data) {
+        alert('Invalid link. Contact the organization who invited you to receive a new assessment link.')
+        return
+      }
+
+      if (new Date(data.token_expires) < new Date()) {
+        alert('Expired link. Contact the organization who invited you to receive a new assessment link.')
         return
       }
 

@@ -105,8 +105,7 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
           <CardContent>
             {!hasResults ? (
               <div className="space-y-4 py-6">
-                <Skeleton className="h-8 w-3/4" />
-                <Skeleton className="h-8 w-1/2" />
+                
                 <p className="text-muted-foreground">
                   No results available yet. Assessment may still be in progress.
                 </p>
