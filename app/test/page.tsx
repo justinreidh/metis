@@ -5,10 +5,10 @@ import { useState, useEffect } from 'react'
 import { QUESTIONS as PersonalityQuestions, calculateTraitScores, LikertValue, BigFiveTrait } from '@/lib/questions/personality'
 import { questions as GCAQuestions } from '@/lib/questions/gca'
 import { createClient } from '@/lib/supabase/client'
-import GCATest from '../components/GCATest'
-import PersonalityTest from '../components/PersonalityTest'   // ← new import
-import Introduction from '../components/Introduction'
-import TestInstructions from '../components/TestInstructions'
+import GCATest from '../../components/GCATest'
+import PersonalityTest from '../../components/PersonalityTest'   // ← new import
+import Introduction from '../../components/Introduction'
+import TestInstructions from '../../components/TestInstructions'
 
 type TestPhase = 
   | 'intro' 
