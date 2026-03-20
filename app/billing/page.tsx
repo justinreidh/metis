@@ -29,7 +29,7 @@ export default function Billing() {
         return;
       }
 
-      const response = await fetch('/api/create-embedded-checkout', {  // your new route
+      const response = await fetch('/api/create-checkout-session', {  // your new route
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user.id, email: user.email }),
@@ -66,9 +66,10 @@ export default function Billing() {
           <CardDescription>Unlock candidate invites and result viewing for $10/month.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Button onClick={handleSubscribe} disabled={loading}>
+        
+          {/*<Button onClick={handleSubscribe} disabled={loading}>
             {loading ? 'Loading...' : 'Subscribe Now'}
-          </Button>
+          </Button>*/}
         </CardContent>
       </Card>
     </div>

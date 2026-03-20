@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     payment_method_types: ['card'],
     line_items: [
       {
-        price: 'price_YourMonthlyPriceIDHere', // e.g. price_1ABC...
+        price: 'price_1T9yFuEcPdjGva3Es26Oz16k', // e.g. price_1ABC...
         quantity: 1,
       },
     ],

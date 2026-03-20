@@ -58,7 +58,7 @@ case 'invoice.payment_failed':
       const userId = subscription.metadata?.user_id;  // Assuming you stored it
 
       if (userId) {
-        await supabase.from('profiles').update({
+        await supabase.from('users').update({
           subscription_status: subscription.status,
         }).eq('id', userId);
       }
@@ -73,7 +73,7 @@ case 'invoice.payment_failed':
     case 'customer.subscription.deleted':
       // Revoke access
       const sub = event.data.object as Stripe.Subscription;
-      await supabase.from('profiles').update({
+      await supabase.from('users').update({
         subscription_status: 'canceled',
       }).eq('subscription_id', sub.id);
       break;
