@@ -24,7 +24,7 @@ export default function Home() {
 
             <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
               <Button size="lg" className="text-lg px-10 py-7 rounded-xl" asChild>
-                <Link href="/signup">
+                <Link href="/auth/signup">
                   Start Free Trial
                 </Link>
               </Button>
