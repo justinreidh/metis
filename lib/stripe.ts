@@ -1,54 +1,86 @@
 // lib/stripe.ts
 
 import Stripe from 'stripe';
-import { createClient } from '@/lib/supabase/server';   // ← or /client depending on usage
+import { createClient } from '@supabase/supabase-js'; // ← direct import, not your wrapper
 
+// ────────────────────────────────────────────────
+//  Regular Stripe instance (used everywhere)
+// ────────────────────────────────────────────────
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-// Example function that needs Supabase
-// lib/stripe.ts (or wherever createOrGetCustomer lives)
-export async function createOrGetCustomer(userId: string, email: string) {
-  const supabase = await createClient();
-
-  // Try to find existing record
-  let { data: userRecord, error } = await supabase
-    .from('users')
-    .select('stripe_customer_id')
-    .eq('id', userId)
-    .maybeSingle();  // ← use .maybeSingle() instead of .single()
-
-  if (error) {
-    console.error('Supabase lookup error:', error);
-    throw error;
+// ────────────────────────────────────────────────
+//  Admin Supabase client – bypasses RLS
+//  ONLY use this in SERVER-SIDE code (API routes, server actions, etc.)
+//  NEVER expose this in client components
+// ────────────────────────────────────────────────
+export const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!, // ← from Supabase → Settings → API → service_role
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+      detectSessionInUrl: false,
+    },
   }
+);
 
-  if (userRecord?.stripe_customer_id) {
-    return userRecord.stripe_customer_id;
-  }
+// ────────────────────────────────────────────────
+//  Creates or returns existing Stripe customer ID
+//  - Looks up in users table
+//  - Creates customer in Stripe if needed
+//  - Upserts stripe_customer_id + email into users
+// ────────────────────────────────────────────────
+export async function createOrGetCustomer(userId: string, email: string): Promise<string> {
+  try {
+    // 1. Look for existing customer ID
+    const { data: userRecord, error: lookupError } = await supabaseAdmin
+      .from('users')
+      .select('stripe_customer_id')
+      .eq('id', userId)
+      .maybeSingle();
 
-  // No customer ID → create Stripe customer
-  const customer = await stripe.customers.create({
-    email,
-    metadata: { supabase_user_id: userId },
-  });
+    if (lookupError) {
+      console.error('Supabase lookup error:', lookupError);
+      throw new Error(`Failed to check existing customer: ${lookupError.message}`);
+    }
 
-  // If no row exists → insert one (or update if partial row exists)
-  const { error: upsertError } = await supabase
-    .from('users')
-    .upsert(
-      {
-        id: userId,
-        email,                   // optional – if you store email here
-        stripe_customer_id: customer.id,
-        // subscription_status: 'inactive', // if you want default
+    if (userRecord?.stripe_customer_id) {
+      return userRecord.stripe_customer_id;
+    }
+
+    // 2. No customer → create one in Stripe
+    const customer = await stripe.customers.create({
+      email,
+      metadata: {
+        supabase_user_id: userId,
       },
-      { onConflict: 'id' }
-    );
+    });
 
-  if (upsertError) {
-    console.error('Failed to upsert user record:', upsertError);
-    throw upsertError;
+    // 3. Upsert into Supabase users table (bypassing RLS via admin client)
+    const { error: upsertError } = await supabaseAdmin
+      .from('users')
+      .upsert(
+        {
+          id: userId,
+          email, // optional but useful for consistency
+          stripe_customer_id: customer.id,
+          // You can add more defaults if desired, e.g.:
+          // subscription_status: 'inactive',
+          // updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'id' }
+      );
+
+    if (upsertError) {
+      console.error('Failed to upsert user with customer ID:', upsertError);
+      // Optional: rollback Stripe customer if critical (rarely needed)
+      throw new Error(`Failed to save customer ID: ${upsertError.message}`);
+    }
+
+    return customer.id;
+  } catch (err) {
+    console.error('createOrGetCustomer failed:', err);
+    throw err; // let the caller handle (e.g. return 500)
   }
-
-  return customer.id;
 }

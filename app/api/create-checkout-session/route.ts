@@ -3,6 +3,7 @@ import { stripe } from '@/lib/stripe';
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { createOrGetCustomer } from '@/lib/stripe';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 
 export async function POST(request: Request) {
   const { userId, email } = await request.json();

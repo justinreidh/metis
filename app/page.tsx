@@ -175,13 +175,13 @@ export default function Home() {
             className="text-lg px-12 py-8 text-indigo-700 bg-white hover:bg-gray-100 rounded-xl shadow-2xl" 
             asChild
           >
-            <Link href="/signup">
+            <Link href="/auth/signup">
               Create Your Free Account →
             </Link>
           </Button>
 
           <p className="mt-8 text-indigo-100">
-            Already have an account? <Link href="/login" className="underline hover:text-white">Sign in</Link>
+            Already have an account? <Link href="/auth/login" className="underline hover:text-white">Sign in</Link>
           </p>
         </div>
       </section>

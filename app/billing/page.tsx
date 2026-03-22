@@ -67,9 +67,9 @@ export default function Billing() {
         </CardHeader>
         <CardContent>
         
-          {/*<Button onClick={handleSubscribe} disabled={loading}>
+          <Button onClick={handleSubscribe} disabled={loading}>
             {loading ? 'Loading...' : 'Subscribe Now'}
-          </Button>*/}
+          </Button>
         </CardContent>
       </Card>
     </div>
