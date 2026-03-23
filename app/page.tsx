@@ -3,10 +3,13 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Brain, Users } from "lucide-react"
 import Link from "next/link"
+import Navbar from "@/components/Navbar"
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <>
+    <Navbar/>
+    <div className="min-h-screen flex flex-col pt-16 md:pt-20">
       {/* Hero Section */}
       <header className="relative bg-gradient-to-br from-indigo-50 via-white to-blue-50">
         <div className="container mx-auto px-6 py-24 md:py-32 text-center relative z-10">
@@ -166,7 +169,7 @@ export default function Home() {
             Start making better hires today
           </h2>
           <p className="text-xl md:text-2xl mb-12 max-w-3xl mx-auto opacity-90">
-            14-day free trial • No credit card required • Cancel anytime
+            7-day free trial • Cancel anytime
           </p>
 
           <Button 
@@ -208,5 +211,6 @@ export default function Home() {
         </div>
       </footer>
     </div>
+    </>
   )
 }
