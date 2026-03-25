@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { ArrowLeft, AlertCircle } from 'lucide-react'
+import { ArrowLeft, AlertCircle, Trophy } from 'lucide-react'
 import { HIGH_PERFORMER_BENCHMARKS } from '@/lib/constants'
 
 interface CandidatePageProps {
@@ -97,9 +97,9 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
           </div>
         </div>
 
-       
+        <Separator className="mb-12" />
 
-        {/* Assessment Results - Full Width */}
+        {/* Assessment Results */}
         <Card className="border-none shadow-xl">
           <CardHeader className="pb-6">
             <CardTitle className="text-2xl">Assessment Results</CardTitle>
@@ -118,6 +118,39 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
               </div>
             ) : (
               <div className="space-y-12">
+                {/* Overall Score - Prominent Section */}
+                <div className="bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-100 rounded-2xl p-10 text-center">
+                  <div className="flex justify-center mb-6">
+                    <div className="inline-flex items-center justify-center w-24 h-24 bg-white rounded-full shadow">
+                      <Trophy className="h-12 w-12 text-amber-500" />
+                    </div>
+                  </div>
+                  
+                  <p className="uppercase tracking-widest text-indigo-600 text-sm font-medium mb-2">
+                    Overall Candidate Score
+                  </p>
+                  <div className="text-7xl font-bold text-gray-900 tracking-tighter">
+                    {result.overall_score}
+                    <span className="text-4xl font-normal text-gray-400">/100</span>
+                  </div>
+                  <p className="mt-4 text-gray-600 max-w-md mx-auto">
+                    This score combines cognitive ability and key personality traits, 
+                    weighted toward the strongest predictors of job performance.
+                  </p>
+                </div>
+
+                {/* Scoring Method */}
+                <div className="bg-white border border-gray-100 rounded-xl p-6 text-sm">
+                  <p className="font-medium mb-2">How this score is calculated:</p>
+                  <ul className="list-disc list-inside space-y-1 text-gray-600">
+                    <li><strong>50%</strong> — General Cognitive Ability (GCA)</li>
+                    <li><strong>20%</strong> — Conscientiousness (most important personality trait)</li>
+                    <li><strong>30%</strong> — Average of the other four Big Five traits</li>
+                  </ul>
+                </div>
+
+                <Separator />
+
                 {/* GCA Section */}
                 <div>
                   <h3 className="text-xl font-semibold mb-6">General Cognitive Ability (GCA)</h3>
@@ -208,7 +241,8 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
                 </div>
 
                 <div className="pt-6 text-sm text-gray-500 italic border-t">
-                  Note: Benchmarks are directional averages from research on high performers. Conscientiousness is the strongest predictor of job success across most roles.
+                  Note: Benchmarks are directional averages from research on high performers. 
+                  Conscientiousness is the strongest predictor of job success across most roles.
                 </div>
               </div>
             )}
