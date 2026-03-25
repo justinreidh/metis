@@ -1,4 +1,3 @@
-// app/dashboard/page.tsx (or wherever your dashboard lives)
 'use client'
 
 import { useEffect, useState, FormEvent } from 'react'
@@ -9,10 +8,10 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Copy, Eye, AlertCircle, Loader2, ArrowRight } from 'lucide-react'
+import { Copy, Eye, Loader2, Plus, AlertCircle, Trophy } from 'lucide-react'
 
 export default function Dashboard() {
-  const [candidates, setCandidates] = useState<any[]>([]) // TODO: replace 'any' with Candidate type
+  const [candidates, setCandidates] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [adding, setAdding] = useState(false)
@@ -34,8 +33,12 @@ export default function Dashboard() {
 
       const { data, error } = await supabase
         .from('candidates')
-        .select('*')
+        .select(`
+          *,
+          results (overall_score)
+        `)
         .eq('company_id', session.user.id)
+        .order('created_at', { ascending: false })
 
       if (error) {
         console.error('Fetch error:', error)
@@ -78,15 +81,15 @@ export default function Dashboard() {
     })
 
     if (error) {
-      console.error('Insert error:', error)
       setError(error.message)
     } else {
-      setError(null)
       form.reset()
-      // Optimistic update + refetch
-      setCandidates(prev => [...prev, { name, email, status: 'pending' }])
-      // Refetch to get real ID and token
-      const { data } = await supabase.from('candidates').select('*').eq('company_id', session.user.id)
+      // Refresh list
+      const { data } = await supabase
+        .from('candidates')
+        .select('*, results (overall_score)')
+        .eq('company_id', session.user.id)
+        .order('created_at', { ascending: false })
       setCandidates(data || [])
     }
     setAdding(false)
@@ -100,7 +103,7 @@ export default function Dashboard() {
       .single()
 
     if (error || !data?.token) {
-      alert('Failed to generate link: ' + (error?.message || 'No token found'))
+      alert('Failed to generate link')
       return
     }
 
@@ -109,8 +112,8 @@ export default function Dashboard() {
     try {
       await navigator.clipboard.writeText(link)
       alert(`Assessment link copied!\n\n${link}`)
-    } catch (err) {
-      alert(`Could not copy automatically.\n\nLink:\n${link}\n\nCopy manually.`)
+    } catch {
+      alert(`Could not copy automatically.\n\nLink: ${link}`)
     }
   }
 
@@ -119,7 +122,7 @@ export default function Dashboard() {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-blue-50">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-12 w-12 animate-spin text-indigo-600" />
-          <p className="text-gray-600">Loading your candidates...</p>
+          <p className="text-gray-600">Loading your dashboard...</p>
         </div>
       </div>
     )
@@ -150,7 +153,6 @@ export default function Dashboard() {
               Manage candidates and assessments
             </p>
           </div>
-          {/* Future: user avatar / dropdown here */}
         </div>
 
         {/* Add Candidate Card */}
@@ -200,7 +202,7 @@ export default function Dashboard() {
                   </>
                 ) : (
                   <>
-                    Add Candidate <ArrowRight className="ml-2 h-5 w-5" />
+                    Add Candidate <Plus className="ml-2 h-5 w-5" />
                   </>
                 )}
               </Button>
@@ -215,7 +217,7 @@ export default function Dashboard() {
               Candidates ({candidates.length})
             </CardTitle>
             <CardDescription>
-              View status, copy assessment links, or see results
+              View status, scores, and assessment links
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -226,48 +228,66 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="space-y-4">
-                {candidates.map((c) => (
-                  <div
-                    key={c.id}
-                    className="flex flex-col sm:flex-row sm:items-center justify-between p-5 bg-white border border-gray-100 rounded-xl hover:border-indigo-200 hover:shadow-md transition-all duration-200"
-                  >
-                    <div className="mb-4 sm:mb-0">
-                      <div className="font-semibold text-lg">{c.name}</div>
-                      <div className="text-sm text-gray-600">{c.email}</div>
+                {candidates.map((c) => {
+                  const overallScore = c.results?.[0]?.overall_score
+                  const hasScore = overallScore !== null && overallScore !== undefined
+
+                  return (
+                    <div
+                      key={c.id}
+                      className="flex flex-col sm:flex-row sm:items-center justify-between p-6 bg-white border border-gray-100 rounded-2xl hover:border-indigo-200 hover:shadow-md transition-all duration-200"
+                    >
+                      <div className="mb-4 sm:mb-0">
+                        <div className="font-semibold text-lg">{c.name}</div>
+                        <div className="text-sm text-gray-600">{c.email}</div>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-4">
+                        {/* Status */}
+                        <Badge 
+                          variant={c.status === 'completed' ? 'default' : c.status === 'in_progress' ? 'secondary' : 'outline'}
+                          className="px-4 py-1"
+                        >
+                          {c.status ? c.status.replace('_', ' ') : 'Pending'}
+                        </Badge>
+
+                        {/* Overall Score - Show only when available */}
+                        {hasScore && (
+                          <div className="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-4 py-1.5 rounded-full font-medium">
+                            <Trophy className="h-4 w-4" />
+                            Score: <span className="font-bold">{overallScore}</span>/100
+                          </div>
+                        )}
+
+                        {/* Copy Link - Only show if no score yet */}
+                        {!hasScore && (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="gap-2"
+                            onClick={() => generateLink(c.id)}
+                          >
+                            <Copy className="h-4 w-4" />
+                            Copy Link
+                          </Button>
+                        )}
+
+                        {/* View Results Button - Always available once candidate exists */}
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50"
+                          asChild
+                        >
+                          <a href={`/candidate/${c.id}`}>
+                            <Eye className="h-4 w-4 mr-2" />
+                            View Details
+                          </a>
+                        </Button>
+                      </div>
                     </div>
-
-                    <div className="flex flex-wrap items-center gap-3">
-                      <Badge 
-                        variant={c.status === 'completed' ? 'default' : c.status === 'in_progress' ? 'secondary' : 'outline'}
-                        className="px-4 py-1 text-sm"
-                      >
-                        {c.status ? c.status.replace('_', ' ') : 'Pending'}
-                      </Badge>
-
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="gap-2"
-                        onClick={() => generateLink(c.id)}
-                      >
-                        <Copy className="h-4 w-4" />
-                        Copy Link
-                      </Button>
-
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50"
-                        asChild
-                      >
-                        <a href={`/candidate/${c.id}`}>
-                          <Eye className="h-4 w-4 mr-2" />
-                          View Results
-                        </a>
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </CardContent>

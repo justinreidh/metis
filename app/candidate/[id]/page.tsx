@@ -97,7 +97,7 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
           </div>
         </div>
 
-        <Separator className="mb-12" />
+        
 
         {/* Assessment Results */}
         <Card className="border-none shadow-xl">
@@ -137,18 +137,13 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
                     This score combines cognitive ability and key personality traits, 
                     weighted toward the strongest predictors of job performance.
                   </p>
+                  <a href='/learn'>
+                    <p className="font-medium mb-2">How this score is calculated</p>
+                  </a>
+                  
                 </div>
 
-                {/* Scoring Method */}
-                <div className="bg-white border border-gray-100 rounded-xl p-6 text-sm">
-                  <p className="font-medium mb-2">How this score is calculated:</p>
-                  <ul className="list-disc list-inside space-y-1 text-gray-600">
-                    <li><strong>50%</strong> — General Cognitive Ability (GCA)</li>
-                    <li><strong>20%</strong> — Conscientiousness (most important personality trait)</li>
-                    <li><strong>30%</strong> — Average of the other four Big Five traits</li>
-                  </ul>
-                </div>
-
+                
                 <Separator />
 
                 {/* GCA Section */}
@@ -230,7 +225,7 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
                             </div>
                             <div className="flex justify-between text-xs text-gray-500 mt-1.5">
                               <span>Low</span>
-                              <span>Ideal</span>
+                              <span>Mid</span>
                               <span>High</span>
                             </div>
                           </div>
