@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Brain, Users, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import Navbar from "@/components/Navbar"
+import Image from "next/image"
 
 export default function Home() {
   return (
@@ -22,7 +23,7 @@ export default function Home() {
               </h1>
 
               <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed">
-                Metis Talent delivers validated pre-employment assessments that help recruiters and hiring managers
+                Metis Talent delivers rapid pre-employment assessments that help recruiters and hiring managers
                 identify top talent faster — with science-backed cognitive and personality insights.
               </p>
 
@@ -94,7 +95,7 @@ export default function Home() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground text-lg leading-relaxed">
-                    Evaluate problem-solving, critical thinking, attention to detail and learning ability with validated GCA-style tests.
+                    Evaluate problem-solving, critical thinking, attention to detail and learning ability with rapid, GCA-style tests.
                   </p>
                 </CardContent>
               </Card>
@@ -133,12 +134,19 @@ export default function Home() {
                     </div>
                     <h3 className="text-3xl font-bold mb-6 text-foreground">1. Invite Candidates</h3>
                     <p className="text-lg text-muted-foreground leading-relaxed">
-                      Add candidates manually or import from your ATS. Send personalized assessment links in seconds.
+                      Quickly add candidates and automatically send personalized assessment links.
                     </p>
                   </div>
                   <div className="bg-muted/50 rounded-2xl p-8 shadow-inner">
-                    <div className="aspect-video bg-card rounded-lg shadow-md flex items-center justify-center text-muted-foreground">
-                      Candidate invite screen preview
+                    <div className="aspect-video bg-card rounded-lg shadow-md overflow-hidden relative">
+                      <Image
+                        src="/candidatelist.png"
+                        alt="Candidate list dashboard preview"
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        priority
+                      />
                     </div>
                   </div>
                 </div>
@@ -154,8 +162,15 @@ export default function Home() {
                     </p>
                   </div>
                   <div className="order-2 md:order-1 bg-muted/50 rounded-2xl p-8 shadow-inner">
-                    <div className="aspect-video bg-card rounded-lg shadow-md flex items-center justify-center text-muted-foreground">
-                      Results dashboard preview
+                    <div className="aspect-video bg-card rounded-lg shadow-md overflow-hidden relative">
+                      <Image
+                        src="/detailpage.png"
+                        alt="Candidate detail dashboard preview"
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        priority
+                      />
                     </div>
                   </div>
                 </div>

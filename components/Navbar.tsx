@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Menu, X } from 'lucide-react'
 import Link from 'next/link'
-import { cn } from '@/lib/utils'
 
 const navItems = [
   { label: 'Features', href: '#features' },
@@ -18,12 +17,12 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <span className="text-2xl md:text-3xl font-bold text-indigo-600 tracking-tight">
+            <span className="text-2xl md:text-3xl font-bold text-primary tracking-tight">
               Metis Talent
             </span>
           </Link>
@@ -34,7 +33,7 @@ export default function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-gray-700 hover:text-indigo-600 font-medium transition-colors"
+                className="text-foreground/80 hover:text-foreground font-medium transition-colors"
               >
                 {item.label}
               </Link>
@@ -46,7 +45,10 @@ export default function Navbar() {
             <Button variant="ghost" size="sm" asChild>
               <Link href="/auth/login">Login</Link>
             </Button>
-            <Button className="bg-indigo-600 hover:bg-indigo-700 text-white px-6" asChild>
+            <Button 
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-6" 
+              asChild
+            >
               <Link href="/auth/signup">
                 Start Free Trial
               </Link>
@@ -63,7 +65,7 @@ export default function Navbar() {
             <SheetContent side="right" className="w-[300px] sm:w-[400px] p-3">
               <div className="flex flex-col h-full py-6">
                 <div className="flex items-center justify-between mb-8">
-                  <span className="text-2xl font-bold text-indigo-600">Metis Talent</span>
+                  <span className="text-2xl font-bold text-primary">Metis Talent</span>
                 </div>
 
                 <nav className="flex flex-col space-y-6 mb-10">
@@ -71,7 +73,7 @@ export default function Navbar() {
                     <Link
                       key={item.href}
                       href={item.href}
-                      className="text-lg font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+                      className="text-lg font-medium text-foreground/80 hover:text-foreground transition-colors"
                       onClick={() => setIsOpen(false)}
                     >
                       {item.label}
@@ -83,7 +85,11 @@ export default function Navbar() {
                   <Button variant="outline" className="w-full" asChild onClick={() => setIsOpen(false)}>
                     <Link href="/auth/login">Login</Link>
                   </Button>
-                  <Button className="w-full bg-indigo-600 hover:bg-indigo-700" asChild onClick={() => setIsOpen(false)}>
+                  <Button 
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" 
+                    asChild 
+                    onClick={() => setIsOpen(false)}
+                  >
                     <Link href="/auth/signup">Start Free Trial</Link>
                   </Button>
                 </div>
