@@ -1,3 +1,4 @@
+// app/dashboard/page.tsx
 'use client'
 
 import { useEffect, useState, FormEvent } from 'react'
@@ -119,10 +120,10 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-blue-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-12 w-12 animate-spin text-indigo-600" />
-          <p className="text-gray-600">Loading your dashboard...</p>
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <p className="text-muted-foreground">Loading your dashboard...</p>
         </div>
       </div>
     )
@@ -130,7 +131,7 @@ export default function Dashboard() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-blue-50 p-6">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted p-6">
         <Alert variant="destructive" className="max-w-lg">
           <AlertCircle className="h-5 w-5" />
           <AlertTitle>Error</AlertTitle>
@@ -141,15 +142,15 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
       <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900">
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
               Your Dashboard
             </h1>
-            <p className="text-xl text-gray-600 mt-2">
+            <p className="text-xl text-muted-foreground mt-2">
               Manage candidates and assessments
             </p>
           </div>
@@ -222,7 +223,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             {candidates.length === 0 ? (
-              <div className="text-center py-16 text-gray-500">
+              <div className="text-center py-16 text-muted-foreground">
                 <p className="text-lg">No candidates yet.</p>
                 <p className="mt-2">Add your first candidate above to get started.</p>
               </div>
@@ -235,11 +236,11 @@ export default function Dashboard() {
                   return (
                     <div
                       key={c.id}
-                      className="flex flex-col sm:flex-row sm:items-center justify-between p-6 bg-white border border-gray-100 rounded-2xl hover:border-indigo-200 hover:shadow-md transition-all duration-200"
+                      className="flex flex-col sm:flex-row sm:items-center justify-between p-6 bg-card border border-border rounded-2xl hover:border-primary/30 hover:shadow-md transition-all duration-200"
                     >
                       <div className="mb-4 sm:mb-0">
-                        <div className="font-semibold text-lg">{c.name}</div>
-                        <div className="text-sm text-gray-600">{c.email}</div>
+                        <div className="font-semibold text-lg text-foreground">{c.name}</div>
+                        <div className="text-sm text-muted-foreground">{c.email}</div>
                       </div>
 
                       <div className="flex flex-wrap items-center gap-4">
@@ -253,7 +254,7 @@ export default function Dashboard() {
 
                         {/* Overall Score - Show only when available */}
                         {hasScore && (
-                          <div className="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-4 py-1.5 rounded-full font-medium">
+                          <div className="flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full font-medium">
                             <Trophy className="h-4 w-4" />
                             Score: <span className="font-bold">{overallScore}</span>/100
                           </div>
@@ -272,11 +273,11 @@ export default function Dashboard() {
                           </Button>
                         )}
 
-                        {/* View Results Button - Always available once candidate exists */}
+                        {/* View Results Button */}
                         <Button 
                           variant="ghost" 
                           size="sm" 
-                          className="text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50"
+                          className="text-primary hover:text-primary/80 hover:bg-primary/5"
                           asChild
                         >
                           <a href={`/candidate/${c.id}`}>

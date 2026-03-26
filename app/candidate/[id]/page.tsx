@@ -43,13 +43,13 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
   const hasResults = !!result && !resultError
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
       <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
         {/* Back Button */}
         <Button 
           variant="ghost" 
           size="sm" 
-          className="mb-8 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50" 
+          className="mb-8 text-primary hover:text-primary/80 hover:bg-primary/5" 
           asChild
         >
           <a href="/dashboard">
@@ -60,17 +60,17 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
 
         {/* Candidate Name + Personal Info Inline */}
         <div className="mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
             {candidate.name}
           </h1>
           
           <div className="mt-4 flex flex-wrap gap-x-8 gap-y-3 text-sm">
             <div>
-              <span className="text-gray-500">Email:</span>{' '}
-              <span className="font-medium">{candidate.email}</span>
+              <span className="text-muted-foreground">Email:</span>{' '}
+              <span className="font-medium text-foreground">{candidate.email}</span>
             </div>
             <div>
-              <span className="text-gray-500">Status:</span>{' '}
+              <span className="text-muted-foreground">Status:</span>{' '}
               <Badge
                 variant={
                   candidate.status === 'completed'
@@ -85,8 +85,8 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
               </Badge>
             </div>
             <div>
-              <span className="text-gray-500">Added on:</span>{' '}
-              <span className="font-medium">
+              <span className="text-muted-foreground">Added on:</span>{' '}
+              <span className="font-medium text-foreground">
                 {new Date(candidate.created_at).toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'long',
@@ -97,7 +97,7 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
           </div>
         </div>
 
-        
+        <Separator className="mb-12" />
 
         {/* Assessment Results */}
         <Card className="border-none shadow-xl">
@@ -110,60 +110,65 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
           <CardContent>
             {!hasResults ? (
               <div className="py-16 flex flex-col items-center justify-center text-center">
-                <AlertCircle className="h-14 w-14 text-gray-400 mb-4" />
-                <h3 className="text-2xl font-medium text-gray-700">No results available yet</h3>
-                <p className="text-gray-600 mt-3 max-w-md">
+                <AlertCircle className="h-14 w-14 text-muted-foreground mb-4" />
+                <h3 className="text-2xl font-medium text-foreground">No results available yet</h3>
+                <p className="text-muted-foreground mt-3 max-w-md">
                   This candidate has not completed the assessment or the results are still being processed.
                 </p>
               </div>
             ) : (
               <div className="space-y-12">
                 {/* Overall Score - Prominent Section */}
-                <div className="bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-100 rounded-2xl p-10 text-center">
+                <div className="bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 rounded-2xl p-10 text-center">
                   <div className="flex justify-center mb-6">
-                    <div className="inline-flex items-center justify-center w-24 h-24 bg-white rounded-full shadow">
-                      <Trophy className="h-12 w-12 text-amber-500" />
+                    <div className="inline-flex items-center justify-center w-24 h-24 bg-background rounded-full shadow">
+                      <Trophy className="h-12 w-12 text-primary" />
                     </div>
                   </div>
                   
-                  <p className="uppercase tracking-widest text-indigo-600 text-sm font-medium mb-2">
+                  <p className="uppercase tracking-widest text-primary text-sm font-medium mb-2">
                     Overall Candidate Score
                   </p>
-                  <div className="text-7xl font-bold text-gray-900 tracking-tighter">
+                  <div className="text-7xl font-bold text-foreground tracking-tighter">
                     {result.overall_score}
-                    <span className="text-4xl font-normal text-gray-400">/100</span>
+                    <span className="text-4xl font-normal text-muted-foreground">/100</span>
                   </div>
-                  <p className="mt-4 text-gray-600 max-w-md mx-auto">
+                  <p className="mt-4 text-muted-foreground max-w-md mx-auto">
                     This score combines cognitive ability and key personality traits, 
                     weighted toward the strongest predictors of job performance.
                   </p>
-                  <a href='/learn'>
-                    <p className="font-medium mb-2">How this score is calculated</p>
-                  </a>
-                  
                 </div>
 
-                
+                {/* Scoring Method */}
+                <div className="bg-card border border-border rounded-xl p-6 text-sm">
+                  <p className="font-medium mb-2 text-foreground">How this score is calculated:</p>
+                  <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                    <li><strong>50%</strong> — General Cognitive Ability (GCA)</li>
+                    <li><strong>20%</strong> — Conscientiousness (most important personality trait)</li>
+                    <li><strong>30%</strong> — Average of the other four Big Five traits</li>
+                  </ul>
+                </div>
+
                 <Separator />
 
                 {/* GCA Section */}
                 <div>
-                  <h3 className="text-xl font-semibold mb-6">General Cognitive Ability (GCA)</h3>
+                  <h3 className="text-xl font-semibold mb-6 text-foreground">General Cognitive Ability (GCA)</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div>
-                      <p className="text-sm text-gray-500">Raw Score</p>
-                      <p className="text-4xl font-bold mt-2">{result.gca_score}</p>
+                      <p className="text-sm text-muted-foreground">Raw Score</p>
+                      <p className="text-4xl font-bold mt-2 text-foreground">{result.gca_score}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Percentile</p>
-                      <p className="text-4xl font-bold mt-2 text-indigo-600">{result.gca_percentile}%</p>
+                      <p className="text-sm text-muted-foreground">Percentile</p>
+                      <p className="text-4xl font-bold mt-2 text-primary">{result.gca_percentile}%</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500 mb-3">High Performer Benchmark</p>
+                      <p className="text-sm text-muted-foreground mb-3">High Performer Benchmark</p>
                       <div className="relative">
-                        <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-3 bg-muted rounded-full overflow-hidden">
                           <div
-                            className="h-3 bg-gradient-to-r from-indigo-600 to-blue-600 rounded-full"
+                            className="h-3 bg-primary rounded-full"
                             style={{ width: `${result.gca_percentile}%` }}
                           />
                         </div>
@@ -172,7 +177,7 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
                           style={{ left: '85%' }}
                         />
                       </div>
-                      <div className="flex justify-between text-xs text-gray-500 mt-2">
+                      <div className="flex justify-between text-xs text-muted-foreground mt-2">
                         <span>0%</span>
                         <span className="font-medium">75–99%</span>
                         <span>100%</span>
@@ -185,7 +190,7 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
 
                 {/* Personality Section */}
                 <div>
-                  <h3 className="text-xl font-semibold mb-6">Big Five Personality Traits</h3>
+                  <h3 className="text-xl font-semibold mb-6 text-foreground">Big Five Personality Traits</h3>
                   <div className="space-y-10">
                     {Object.entries(result.personality_percentiles || {}).map(([traitKey, percentileValue]) => {
                       const trait = traitKey as keyof typeof HIGH_PERFORMER_BENCHMARKS.personality
@@ -198,24 +203,24 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
                       return (
                         <div key={trait} className="space-y-4">
                           <div className="flex justify-between items-baseline">
-                            <h4 className="font-medium text-lg capitalize">
+                            <h4 className="font-medium text-lg capitalize text-foreground">
                               {trait.replace('_', ' ')}
                             </h4>
                             <div className="text-right">
-                              <span className="text-3xl font-bold">{score}%</span>
+                              <span className="text-3xl font-bold text-foreground">{score}%</span>
                               {raw !== null && (
-                                <span className="text-sm text-gray-500 ml-3">(Raw: {raw})</span>
+                                <span className="text-sm text-muted-foreground ml-3">(Raw: {raw})</span>
                               )}
                             </div>
                           </div>
 
                           <div>
-                            <p className="text-sm text-gray-500 mb-2">
+                            <p className="text-sm text-muted-foreground mb-2">
                               High Performer Benchmark: {benchmark.min}–{benchmark.max}% (ideal ~{benchmark.ideal})
                             </p>
-                            <div className="relative h-4 bg-gray-100 rounded-full overflow-hidden">
+                            <div className="relative h-4 bg-muted rounded-full overflow-hidden">
                               <div
-                                className="absolute h-4 bg-gradient-to-r from-indigo-500 to-blue-600 rounded-full transition-all"
+                                className="absolute h-4 bg-primary rounded-full transition-all"
                                 style={{ width: `${score}%` }}
                               />
                               <div
@@ -223,9 +228,9 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
                                 style={{ left: `${benchmark.ideal}%` }}
                               />
                             </div>
-                            <div className="flex justify-between text-xs text-gray-500 mt-1.5">
+                            <div className="flex justify-between text-xs text-muted-foreground mt-1.5">
                               <span>Low</span>
-                              <span>Mid</span>
+                              <span>Ideal</span>
                               <span>High</span>
                             </div>
                           </div>
@@ -235,7 +240,7 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
                   </div>
                 </div>
 
-                <div className="pt-6 text-sm text-gray-500 italic border-t">
+                <div className="pt-6 text-sm text-muted-foreground italic border-t border-border">
                   Note: Benchmarks are directional averages from research on high performers. 
                   Conscientiousness is the strongest predictor of job success across most roles.
                 </div>

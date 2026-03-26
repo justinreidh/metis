@@ -47,19 +47,19 @@ export default function Signup() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-blue-50 px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted px-4 py-12">
       <div className="w-full max-w-md">
-        {/* Logo / Brand */}
+        {/* Brand / Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-indigo-600 tracking-tight">Metis Talent</h1>
-          <p className="text-gray-600 mt-2">Science-backed pre-employment assessments</p>
+          <h1 className="text-4xl font-bold text-primary tracking-tight">Metis Talent</h1>
+          <p className="text-muted-foreground mt-2">Science-backed pre-employment assessments</p>
         </div>
 
         <Card className="border-none shadow-xl">
           <CardHeader className="space-y-1 pb-6">
             <CardTitle className="text-2xl font-bold text-center">Create your account</CardTitle>
             <CardDescription className="text-center">
-              Start your 7-day free trial
+              Start your 7-day free trial — no credit card required
             </CardDescription>
           </CardHeader>
 
@@ -69,7 +69,7 @@ export default function Signup() {
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="email"
                     type="email"
@@ -87,7 +87,7 @@ export default function Signup() {
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="password"
                     type="password"
@@ -100,7 +100,7 @@ export default function Signup() {
                     disabled={loading}
                   />
                 </div>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   Minimum 6 characters
                 </p>
               </div>
@@ -116,7 +116,7 @@ export default function Signup() {
 
               {/* Success Message */}
               {message && (
-                <Alert variant="default" className="bg-green-50 border-green-200 text-green-800">
+                <Alert variant="default" className="border-green-200 text-green-800">
                   <Mail className="h-4 w-4" />
                   <AlertTitle>Check your inbox</AlertTitle>
                   <AlertDescription>{message}</AlertDescription>
@@ -138,21 +138,21 @@ export default function Signup() {
             </form>
           </CardContent>
 
-          <CardFooter className="flex flex-col space-y-4 pt-2 border-t">
-            <p className="text-sm text-gray-600 text-center">
+          <CardFooter className="flex flex-col space-y-4 pt-2 border-t border-border">
+            <p className="text-sm text-muted-foreground text-center">
               Already have an account?{' '}
-              <Link href="/auth/login" className="text-indigo-600 hover:text-indigo-800 font-medium">
+              <Link href="/auth/login" className="text-primary hover:text-primary/80 font-medium">
                 Sign in
               </Link>
             </p>
 
-            <p className="text-xs text-gray-500 text-center">
+            <p className="text-xs text-muted-foreground text-center">
               By signing up, you agree to our{' '}
-              <Link href="/terms" className="underline hover:text-gray-700">
+              <Link href="/terms" className="underline hover:text-foreground">
                 Terms of Service
               </Link>{' '}
               and{' '}
-              <Link href="/privacy" className="underline hover:text-gray-700">
+              <Link href="/privacy" className="underline hover:text-foreground">
                 Privacy Policy
               </Link>
             </p>
