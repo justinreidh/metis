@@ -8,9 +8,9 @@ import { Menu, X } from 'lucide-react'
 import Link from 'next/link'
 
 const navItems = [
-  { label: 'Features', href: '#features' },
-  { label: 'Pricing', href: '#pricing' },
-  { label: 'About', href: '#about' },
+  { label: 'Features', href: '/features' },
+  { label: 'Pricing', href: '/pricing' },
+  { label: 'About', href: '/about' },
 ]
 
 export default function Navbar() {
