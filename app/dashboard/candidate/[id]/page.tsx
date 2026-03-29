@@ -139,15 +139,7 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
                   </p>
                 </div>
 
-                {/* Scoring Method */}
-                <div className="bg-card border border-border rounded-xl p-6 text-sm">
-                  <p className="font-medium mb-2 text-foreground">How this score is calculated:</p>
-                  <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                    <li><strong>50%</strong> — General Cognitive Ability (GCA)</li>
-                    <li><strong>20%</strong> — Conscientiousness (most important personality trait)</li>
-                    <li><strong>30%</strong> — Average of the other four Big Five traits</li>
-                  </ul>
-                </div>
+            
 
                 <Separator />
 
@@ -208,9 +200,7 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
                             </h4>
                             <div className="text-right">
                               <span className="text-3xl font-bold text-foreground">{score}%</span>
-                              {raw !== null && (
-                                <span className="text-sm text-muted-foreground ml-3">(Raw: {raw})</span>
-                              )}
+                              
                             </div>
                           </div>
 

@@ -280,7 +280,7 @@ export default function Dashboard() {
                           className="text-primary hover:text-primary/80 hover:bg-primary/5"
                           asChild
                         >
-                          <a href={`/candidate/${c.id}`}>
+                          <a href={`/dashboard/candidate/${c.id}`}>
                             <Eye className="h-4 w-4 mr-2" />
                             View Details
                           </a>
