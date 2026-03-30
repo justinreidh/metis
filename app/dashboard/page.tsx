@@ -1,142 +1,74 @@
 // app/dashboard/page.tsx
 'use client'
 
-import { useEffect, useState, FormEvent } from 'react'
+import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
-import { Copy, Eye, Loader2, Plus, AlertCircle, Trophy } from 'lucide-react'
+import Link from 'next/link'
+import { Plus, Users, Trophy, TrendingUp, Clock } from 'lucide-react'
 
-export default function Dashboard() {
-  const [candidates, setCandidates] = useState<any[]>([])
+export default function DashboardOverview() {
+  const [stats, setStats] = useState({
+    totalCandidates: 0,
+    completed: 0,
+    avgScore: 0,
+  })
+  const [recentCandidates, setRecentCandidates] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [adding, setAdding] = useState(false)
 
   const supabase = createClient()
 
   useEffect(() => {
-    async function fetchCandidates() {
-      setLoading(true)
-      setError(null)
-
+    async function fetchDashboardData() {
       const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.user) return
 
-      if (!session?.user) {
-        setError('Please sign in to view your dashboard')
-        setLoading(false)
-        return
-      }
-
-      const { data, error } = await supabase
+      // Fetch candidates with their results
+      const { data: candidatesData } = await supabase
         .from('candidates')
         .select(`
-          *,
+          id, name, email, status, created_at,
           results (overall_score)
         `)
         .eq('company_id', session.user.id)
         .order('created_at', { ascending: false })
+        .limit(8)
 
-      if (error) {
-        console.error('Fetch error:', error)
-        setError(error.message)
-      } else {
-        setCandidates(data || [])
+      if (candidatesData) {
+        const total = candidatesData.length
+        const completed = candidatesData.filter(c => c.status === 'completed').length
+        const scores = candidatesData
+          .flatMap(c => c.results?.map((r: any) => r.overall_score) || [])
+          .filter(Boolean)
+
+        const avgScore = scores.length 
+          ? Math.round(scores.reduce((a: number, b: number) => a + b, 0) / scores.length)
+          : 0
+
+        setStats({
+          totalCandidates: total,
+          completed,
+          avgScore,
+        })
+
+        setRecentCandidates(candidatesData.slice(0, 5))
       }
+
       setLoading(false)
     }
 
-    fetchCandidates()
+    fetchDashboardData()
   }, [supabase])
-
-  async function handleAddCandidate(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setAdding(true)
-    setError(null)
-
-    const form = e.currentTarget
-    const name = (form.elements.namedItem('name') as HTMLInputElement)?.value.trim()
-    const email = (form.elements.namedItem('email') as HTMLInputElement)?.value.trim()
-
-    if (!name || !email) {
-      setError('Name and email are required')
-      setAdding(false)
-      return
-    }
-
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session?.user) {
-      setError('Not authenticated')
-      setAdding(false)
-      return
-    }
-
-    const { error } = await supabase.from('candidates').insert({
-      company_id: session.user.id,
-      name,
-      email,
-    })
-
-    if (error) {
-      setError(error.message)
-    } else {
-      form.reset()
-      // Refresh list
-      const { data } = await supabase
-        .from('candidates')
-        .select('*, results (overall_score)')
-        .eq('company_id', session.user.id)
-        .order('created_at', { ascending: false })
-      setCandidates(data || [])
-    }
-    setAdding(false)
-  }
-
-  async function generateLink(candidateId: number | string) {
-    const { data, error } = await supabase
-      .from('candidates')
-      .select('token')
-      .eq('id', candidateId)
-      .single()
-
-    if (error || !data?.token) {
-      alert('Failed to generate link')
-      return
-    }
-
-    const link = `${window.location.origin}/test?token=${data.token}`
-
-    try {
-      await navigator.clipboard.writeText(link)
-      alert(`Assessment link copied!\n\n${link}`)
-    } catch {
-      alert(`Could not copy automatically.\n\nLink: ${link}`)
-    }
-  }
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-12 w-12 animate-spin text-primary" />
-          <p className="text-muted-foreground">Loading your dashboard...</p>
+        <div className="text-center">
+          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
+          <p className="text-muted-foreground mt-4">Loading your overview...</p>
         </div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted p-6">
-        <Alert variant="destructive" className="max-w-lg">
-          <AlertCircle className="h-5 w-5" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
       </div>
     )
   }
@@ -144,146 +76,99 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
       <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
-          <div>
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
-              Your Dashboard
-            </h1>
-            <p className="text-xl text-muted-foreground mt-2">
-              Manage candidates and assessments
-            </p>
-          </div>
+        <div className="mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
+            Welcome back
+          </h1>
+          <p className="text-xl text-muted-foreground mt-3">
+            Here's what's happening with your hiring pipeline
+          </p>
         </div>
 
-        {/* Add Candidate Card */}
-        <Card className="mb-10 border-none shadow-xl">
-          <CardHeader className="pb-6">
-            <CardTitle className="text-2xl">Add New Candidate</CardTitle>
-            <CardDescription>
-              Invite a candidate to complete an assessment. We'll send them a secure link.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleAddCandidate} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
-                  <Input id="name" placeholder="John Doe" required disabled={adding} />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="candidate@company.com"
-                    required
-                    disabled={adding}
-                  />
-                </div>
-              </div>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Candidates</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl font-bold">{stats.totalCandidates}</div>
+            </CardContent>
+          </Card>
 
-              {error && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>Error</AlertTitle>
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Completed Assessments</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl font-bold">{stats.completed}</div>
+              <p className="text-sm text-muted-foreground mt-1">
+                {stats.totalCandidates > 0 
+                  ? Math.round((stats.completed / stats.totalCandidates) * 100) 
+                  : 0}% completion rate
+              </p>
+            </CardContent>
+          </Card>
 
-              <Button 
-                type="submit" 
-                className="w-full md:w-auto px-10 py-6 text-lg"
-                disabled={adding}
-              >
-                {adding ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Adding Candidate...
-                  </>
-                ) : (
-                  <>
-                    Add Candidate <Plus className="ml-2 h-5 w-5" />
-                  </>
-                )}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Average Score</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl font-bold">{stats.avgScore}</div>
+              <p className="text-sm text-muted-foreground mt-1">out of 100</p>
+            </CardContent>
+          </Card>
 
-        {/* Candidates List */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">This Month</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl font-bold text-primary">12</div>
+              <p className="text-sm text-muted-foreground mt-1">candidates added</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Recent Candidates */}
         <Card className="border-none shadow-xl">
-          <CardHeader className="pb-6">
-            <CardTitle className="text-2xl">
-              Candidates ({candidates.length})
-            </CardTitle>
-            <CardDescription>
-              View status, scores, and assessment links
-            </CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Recent Candidates</CardTitle>
+              <CardDescription>Latest additions and their progress</CardDescription>
+            </div>
+            <Button variant="outline" asChild>
+              <Link href="/dashboard/candidates">View All</Link>
+            </Button>
           </CardHeader>
           <CardContent>
-            {candidates.length === 0 ? (
-              <div className="text-center py-16 text-muted-foreground">
-                <p className="text-lg">No candidates yet.</p>
-                <p className="mt-2">Add your first candidate above to get started.</p>
-              </div>
+            {recentCandidates.length === 0 ? (
+              <p className="text-center py-12 text-muted-foreground">No candidates yet. Add your first one above.</p>
             ) : (
               <div className="space-y-4">
-                {candidates.map((c) => {
-                  const overallScore = c.results?.[0]?.overall_score
-                  const hasScore = overallScore !== null && overallScore !== undefined
-
+                {recentCandidates.map((c) => {
+                  const score = c.results?.[0]?.overall_score
                   return (
                     <div
                       key={c.id}
-                      className="flex flex-col sm:flex-row sm:items-center justify-between p-6 bg-card border border-border rounded-2xl hover:border-primary/30 hover:shadow-md transition-all duration-200"
+                      className="flex flex-col sm:flex-row sm:items-center justify-between p-5 bg-card border border-border rounded-2xl hover:border-primary/30 transition-colors"
                     >
-                      <div className="mb-4 sm:mb-0">
-                        <div className="font-semibold text-lg text-foreground">{c.name}</div>
+                      <div>
+                        <div className="font-medium">{c.name}</div>
                         <div className="text-sm text-muted-foreground">{c.email}</div>
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-4">
-                        {/* Status */}
-                        <Badge 
-                          variant={c.status === 'completed' ? 'default' : c.status === 'in_progress' ? 'secondary' : 'outline'}
-                          className="px-4 py-1"
-                        >
-                          {c.status ? c.status.replace('_', ' ') : 'Pending'}
-                        </Badge>
-
-                        {/* Overall Score - Show only when available */}
-                        {hasScore && (
-                          <div className="flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full font-medium">
-                            <Trophy className="h-4 w-4" />
-                            Score: <span className="font-bold">{overallScore}</span>/100
+                      <div className="flex items-center gap-6 mt-4 sm:mt-0">
+                        {score !== undefined && (
+                          <div className="text-right">
+                            <div className="text-xl font-bold">{score}</div>
+                            <div className="text-xs text-muted-foreground">Score</div>
                           </div>
                         )}
 
-                        {/* Copy Link - Only show if no score yet */}
-                        {!hasScore && (
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="gap-2"
-                            onClick={() => generateLink(c.id)}
-                          >
-                            <Copy className="h-4 w-4" />
-                            Copy Link
-                          </Button>
-                        )}
-
-                        {/* View Results Button */}
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="text-primary hover:text-primary/80 hover:bg-primary/5"
-                          asChild
-                        >
-                          <a href={`/dashboard/candidate/${c.id}`}>
-                            <Eye className="h-4 w-4 mr-2" />
-                            View Details
-                          </a>
+                        <Button variant="ghost" size="sm" asChild>
+                          <Link href={`/dashboard/${c.id}`}>View Details</Link>
                         </Button>
                       </div>
                     </div>
@@ -293,6 +178,37 @@ export default function Dashboard() {
             )}
           </CardContent>
         </Card>
+
+        {/* Quick Actions */}
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card className="border-none shadow-xl hover:shadow-2xl transition-shadow cursor-pointer" >
+            <Link href="/dashboard/add">
+              <CardContent className="p-8 flex items-center gap-6">
+                <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center">
+                  <Plus className="h-8 w-8 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold">Add New Candidate</h3>
+                  <p className="text-muted-foreground">Invite someone to take an assessment</p>
+                </div>
+              </CardContent>
+            </Link>
+          </Card>
+
+          <Card className="border-none shadow-xl hover:shadow-2xl transition-shadow cursor-pointer" >
+            <Link href="/dashboard/candidates">
+              <CardContent className="p-8 flex items-center gap-6">
+                <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center">
+                  <Users className="h-8 w-8 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold">View All Candidates</h3>
+                  <p className="text-muted-foreground">Browse and manage your full list</p>
+                </div>
+              </CardContent>
+            </Link>
+          </Card>
+        </div>
       </div>
     </div>
   )

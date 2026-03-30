@@ -66,10 +66,7 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
       <div className="container mx-auto px-6 py-12 max-w-6xl">
-        {/* Back Button */}
-        <Button variant="ghost" size="sm" className="mb-10" asChild>
-          <Link href="/">← Back to Home</Link>
-        </Button>
+        
 
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold tracking-tight mb-6">Simple, transparent pricing</h1>
