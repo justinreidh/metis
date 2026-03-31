@@ -22,7 +22,7 @@ export async function POST(request: Request) {
       },
     ],
     ui_mode: 'embedded',                    // ← Key for Embedded Checkout
-    return_url: `${process.env.NEXT_PUBLIC_SITE_URL}/billing?session_id={CHECKOUT_SESSION_ID}`,
+    return_url: `${process.env.NEXT_PUBLIC_SITE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
     subscription_data: {
         trial_period_days: 7,
     },

@@ -125,11 +125,80 @@ export default function DashboardOverview() {
               <CardTitle className="text-sm font-medium text-muted-foreground">This Month</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-4xl font-bold text-primary">12</div>
+              <div className="text-4xl font-bold text-primary">{stats.totalCandidates}</div>
               <p className="text-sm text-muted-foreground mt-1">candidates added</p>
             </CardContent>
           </Card>
         </div>
+
+        <div className="grid md:grid-cols-2 gap-8 mb-12">
+        {/* Score Distribution */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Score Distribution</CardTitle>
+            <CardDescription>Overall scores across all candidates</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6 pt-4">
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span>80–100 (Excellent)</span>
+                  <span className="font-medium">18 candidates</span>
+                </div>
+                <div className="h-2 bg-primary rounded-full w-[70%]"></div>
+              </div>
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span>60–79 (Good)</span>
+                  <span className="font-medium">21 candidates</span>
+                </div>
+                <div className="h-2 bg-primary/70 rounded-full w-[45%]"></div>
+              </div>
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span>Below 60 (Needs Review)</span>
+                  <span className="font-medium">8 candidates</span>
+                </div>
+                <div className="h-2 bg-muted rounded-full w-[17%]"></div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Recent Activity */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Activity</CardTitle>
+            <CardDescription>Last 30 days</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6">
+              <div className="flex gap-4">
+                <div className="w-2 h-2 mt-2 bg-green-500 rounded-full"></div>
+                <div>
+                  <p className="font-medium">Sarah Chen completed assessment</p>
+                  <p className="text-sm text-muted-foreground">Overall Score: 88 • 2 hours ago</p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="w-2 h-2 mt-2 bg-green-500 rounded-full"></div>
+                <div>
+                  <p className="font-medium">Marcus Okoro completed assessment</p>
+                  <p className="text-sm text-muted-foreground">Overall Score: 79 • Yesterday</p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="w-2 h-2 mt-2 bg-amber-500 rounded-full"></div>
+                <div>
+                  <p className="font-medium">3 candidates invited</p>
+                  <p className="text-sm text-muted-foreground">This week</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
 
         {/* Recent Candidates */}
         <Card className="border-none shadow-xl">
@@ -168,7 +237,7 @@ export default function DashboardOverview() {
                         )}
 
                         <Button variant="ghost" size="sm" asChild>
-                          <Link href={`/dashboard/${c.id}`}>View Details</Link>
+                          <Link href={`/candidate/${c.id}`}>View Details</Link>
                         </Button>
                       </div>
                     </div>
