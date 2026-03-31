@@ -30,7 +30,7 @@ export default function Signup() {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/welcome`,
+          emailRedirectTo: `${window.location.origin}/onboarding`,
         },
       })
 
@@ -59,7 +59,7 @@ export default function Signup() {
           <CardHeader className="space-y-1 pb-6">
             <CardTitle className="text-2xl font-bold text-center">Create your account</CardTitle>
             <CardDescription className="text-center">
-              Start your 7-day free trial — no credit card required
+              Start your 7-day free trial — and start evidence-based hiring
             </CardDescription>
           </CardHeader>
 
