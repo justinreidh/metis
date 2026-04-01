@@ -164,7 +164,7 @@ export default function CandidatesPage() {
                         )}
 
                         <Button variant="ghost" size="sm" asChild>
-                          <a href={`/dashboard/${c.id}`}>
+                          <a href={`/dashboard/candidate/${c.id}`}>
                             <Eye className="h-4 w-4 mr-2" />
                             View Details
                           </a>

@@ -45,18 +45,7 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
       <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        {/* Back Button */}
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="mb-8 text-primary hover:text-primary/80 hover:bg-primary/5" 
-          asChild
-        >
-          <a href="/dashboard">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Dashboard
-          </a>
-        </Button>
+        
 
         {/* Candidate Name + Personal Info Inline */}
         <div className="mb-12">

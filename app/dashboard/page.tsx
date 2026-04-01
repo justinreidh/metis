@@ -98,7 +98,7 @@ export default function DashboardOverview() {
 
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Completed Assessments</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Completed</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-4xl font-bold">{stats.completed}</div>
@@ -237,7 +237,7 @@ export default function DashboardOverview() {
                         )}
 
                         <Button variant="ghost" size="sm" asChild>
-                          <Link href={`/candidate/${c.id}`}>View Details</Link>
+                          <Link href={`/dashboard/candidate/${c.id}`}>View Details</Link>
                         </Button>
                       </div>
                     </div>
