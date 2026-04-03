@@ -209,7 +209,7 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
                             </div>
                             <div className="flex justify-between text-xs text-muted-foreground mt-1.5">
                               <span>Low</span>
-                              <span>Ideal</span>
+                              
                               <span>High</span>
                             </div>
                           </div>
