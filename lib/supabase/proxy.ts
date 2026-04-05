@@ -39,7 +39,7 @@ export async function updateSession(request: NextRequest) {
 
   // prevent redirect on specific routes
   const publicPaths = [
-    '/',         
+    '/', '/features', '/pricing', '/about', '/privacy', '/contact','/terms',
   ]
 
   const isPublicPath = publicPaths.includes(request.nextUrl.pathname)
