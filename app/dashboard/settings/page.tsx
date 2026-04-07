@@ -25,11 +25,10 @@ export default function SettingsPage() {
 
       <Tabs defaultValue="profile" className="w-full">
         {/* Tabs Navigation - Now properly placed above content */}
-        <TabsList className="mb-10 grid w-full grid-cols-4">
+        <TabsList className="mb-10 grid w-full grid-cols-3">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="company">Company</TabsTrigger>
           <TabsTrigger value="billing">Billing</TabsTrigger>
-          <TabsTrigger value="preferences">Preferences</TabsTrigger>
         </TabsList>
 
         {/* Profile Tab */}
@@ -111,40 +110,7 @@ export default function SettingsPage() {
           </Card>
         </TabsContent>
 
-        {/* Preferences Tab */}
-        <TabsContent value="preferences">
-          <Card className="border-none shadow-xl">
-            <CardHeader>
-              <CardTitle>Notification Preferences</CardTitle>
-              <CardDescription>Control how you receive updates</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-8">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">Email Notifications</p>
-                  <p className="text-sm text-muted-foreground">Receive updates about new candidates and results</p>
-                </div>
-                <Switch 
-                  checked={emailNotifications} 
-                  onCheckedChange={setEmailNotifications} 
-                />
-              </div>
-
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">Assessment Reminders</p>
-                  <p className="text-sm text-muted-foreground">Get reminded when candidates haven't completed their test</p>
-                </div>
-                <Switch 
-                  checked={assessmentReminders} 
-                  onCheckedChange={setAssessmentReminders} 
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+        
       </Tabs>
     </div>
   )
