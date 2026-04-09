@@ -1,4 +1,3 @@
-// app/signup/page.tsx
 'use client'
 
 import { useState } from 'react'
@@ -8,11 +7,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react'
+import { Mail, Lock, ArrowRight, AlertCircle, User, Building } from 'lucide-react'
 import Link from 'next/link'
 
 export default function Signup() {
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
+  const [companyName, setCompanyName] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -26,18 +28,30 @@ export default function Signup() {
 
     try {
       const supabase = createClient()
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/onboarding`,
+          // Pass user metadata (first_name, last_name, company_name)
+          data: {
+            first_name: firstName.trim(),
+            last_name: lastName.trim(),
+            company_name: companyName.trim() || null,
+          },
         },
       })
 
       if (error) throw error
 
       setMessage('Check your email for the confirmation link! (Check spam folder if not received)')
+      
+      // Clear form
+      setFirstName('')
+      setLastName('')
       setEmail('')
+      setCompanyName('')
       setPassword('')
     } catch (err: any) {
       setError(err.message || 'An error occurred during signup')
@@ -65,6 +79,42 @@ export default function Signup() {
 
           <CardContent>
             <form onSubmit={handleSignup} className="space-y-5">
+              {/* First Name */}
+              <div className="space-y-2">
+                <Label htmlFor="firstName">First Name</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="firstName"
+                    type="text"
+                    placeholder="John"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    required
+                    className="pl-10"
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+
+              {/* Last Name */}
+              <div className="space-y-2">
+                <Label htmlFor="lastName">Last Name</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="lastName"
+                    type="text"
+                    placeholder="Doe"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    required
+                    className="pl-10"
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+
               {/* Email Field */}
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
@@ -77,6 +127,23 @@ export default function Signup() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    className="pl-10"
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+
+              {/* Company Name (Optional) */}
+              <div className="space-y-2">
+                <Label htmlFor="companyName">Company Name <span className="text-muted-foreground">(optional)</span></Label>
+                <div className="relative">
+                  <Building className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="companyName"
+                    type="text"
+                    placeholder="Acme Corp"
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
                     className="pl-10"
                     disabled={loading}
                   />
