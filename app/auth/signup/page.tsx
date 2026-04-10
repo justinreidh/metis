@@ -39,6 +39,7 @@ export default function Signup() {
             first_name: firstName.trim(),
             last_name: lastName.trim(),
             company_name: companyName.trim() || null,
+            full_name: `${firstName.trim()} ${lastName.trim()}`.trim(),
           },
         },
       })
