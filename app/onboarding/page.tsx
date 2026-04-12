@@ -86,7 +86,7 @@ export default function OnboardingPage() {
           </div>
           <CardTitle className="text-3xl">Welcome to Metis Talent!</CardTitle>
           <CardDescription className="text-lg mt-3">
-            You're all set. Let's start your 7-day free trial and begin making better hires.
+            You're all set. Let's set up your 7-day free trial and start making better hires.
           </CardDescription>
         </CardHeader>
 
