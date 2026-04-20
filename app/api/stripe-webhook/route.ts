@@ -32,7 +32,7 @@ export async function POST(req: Request) {
       const userId = session.metadata?.user_id;
       if (userId && session.subscription) {
         const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
-        await supabase.from('users').update({
+        await supabase.from('profiles').update({
           subscription_id: subscription.id,
           subscription_status: subscription.status, // 'active'
         }).eq('id', userId);
@@ -59,7 +59,7 @@ case 'invoice.payment_failed':
       const userId = subscription.metadata?.user_id;  // Assuming you stored it
 
       if (userId) {
-        await supabase.from('users').update({
+        await supabase.from('profiles').update({
           subscription_status: subscription.status,
         }).eq('id', userId);
       }
@@ -74,7 +74,7 @@ case 'invoice.payment_failed':
     case 'customer.subscription.deleted':
       // Revoke access
       const sub = event.data.object as Stripe.Subscription;
-      await supabase.from('users').update({
+      await supabase.from('profiles').update({
         subscription_status: 'canceled',
       }).eq('subscription_id', sub.id);
       break;

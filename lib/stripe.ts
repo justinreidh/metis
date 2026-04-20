@@ -35,7 +35,7 @@ export async function createOrGetCustomer(userId: string, email: string): Promis
   try {
     // 1. Look for existing customer ID
     const { data: userRecord, error: lookupError } = await supabaseAdmin
-      .from('users')
+      .from('profiles')
       .select('stripe_customer_id')
       .eq('id', userId)
       .maybeSingle();
@@ -59,11 +59,10 @@ export async function createOrGetCustomer(userId: string, email: string): Promis
 
     // 3. Upsert into Supabase users table (bypassing RLS via admin client)
     const { error: upsertError } = await supabaseAdmin
-      .from('users')
+      .from('profiles')
       .upsert(
         {
           id: userId,
-          email, // optional but useful for consistency
           stripe_customer_id: customer.id,
           // You can add more defaults if desired, e.g.:
           // subscription_status: 'inactive',

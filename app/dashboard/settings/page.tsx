@@ -209,6 +209,7 @@ export default function SettingsPage() {
                   }
                 </Badge>
               </div>
+            
 
               <div className="flex gap-4">
                 <Button variant="outline">Manage Subscription</Button>
