@@ -14,6 +14,7 @@ type Profile = {
   first_name: string
   last_name: string
   company_name: string
+  subscription_status: string
 }
 
 export default function SettingsPage() {
@@ -23,6 +24,7 @@ export default function SettingsPage() {
     first_name: '',
     last_name: '',
     company_name: '',
+    subscription_status: '',
   })
 
   const [email, setEmail] = useState<string>('')
@@ -48,7 +50,7 @@ export default function SettingsPage() {
         // Fetch profile
         const { data: profileData } = await supabase
           .from('profiles')
-          .select('first_name, last_name, company_name')
+          .select('first_name, last_name, company_name, subscription_status')
           .eq('id', user.id)
           .single()
 
@@ -56,16 +58,10 @@ export default function SettingsPage() {
           first_name: profileData?.first_name ?? '',
           last_name: profileData?.last_name ?? '',
           company_name: profileData?.company_name ?? '',
+          subscription_status: profileData?.subscription_status ?? '',
         })
 
-        // Fetch subscription status
-        const { data: userData } = await supabase
-          .from('users')
-          .select('subscription_status')
-          .eq('id', user.id)
-          .single()
-
-        setSubscriptionStatus(userData?.subscription_status ?? null)
+        
 
       } catch (err: any) {
         console.error(err)
@@ -203,8 +199,8 @@ export default function SettingsPage() {
                   <p className="text-muted-foreground">$99/month • Billed monthly</p>
                 </div>
                 <Badge variant={subscriptionStatus === 'active' ? 'default' : 'secondary'}>
-                  {subscriptionStatus 
-                    ? subscriptionStatus.charAt(0).toUpperCase() + subscriptionStatus.slice(1)
+                  {profile.subscription_status 
+                    ? profile.subscription_status.charAt(0).toUpperCase() + profile.subscription_status.slice(1)
                     : 'Inactive'
                   }
                 </Badge>
