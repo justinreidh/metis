@@ -51,18 +51,14 @@ export default function Home() {
         {/* Trust / Stats Bar */}
         <section className="py-12 bg-card border-t border-border">
           <div className="container mx-auto px-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              <div>
-                <div className="text-4xl font-bold text-primary">92%</div>
-                <p className="text-muted-foreground mt-2">Higher quality hires</p>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-primary">40%</div>
-                <p className="text-muted-foreground mt-2">Faster time-to-hire</p>
-              </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-8 text-center">
               <div>
                 <div className="text-4xl font-bold text-primary">3.2×</div>
                 <p className="text-muted-foreground mt-2">Better prediction of performance</p>
+              </div>
+              <div>
+                <div className="text-4xl font-bold text-primary">Unlimited</div>
+                <p className="text-muted-foreground mt-2">Candidates and assessments</p>
               </div>
               <div>
                 <div className="text-4xl font-bold text-primary">24/7</div>

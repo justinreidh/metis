@@ -45,6 +45,17 @@ export async function updateSession(request: NextRequest) {
   const isPublicPath = publicPaths.includes(request.nextUrl.pathname)
 
   if (
+    user &&
+    (request.nextUrl.pathname.startsWith('/auth/login') ||
+      request.nextUrl.pathname.startsWith('/login') ||
+      request.nextUrl.pathname.startsWith('/auth/signup'))
+  ) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/dashboard'
+    return NextResponse.redirect(url)
+  }
+
+  if (
     !user &&
     !isPublicPath &&
     !request.nextUrl.pathname.startsWith('/login') &&
