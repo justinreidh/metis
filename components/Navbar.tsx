@@ -23,7 +23,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <span className="text-2xl md:text-3xl font-bold text-primary tracking-tight">
-              Metis Talent
+              Metis
             </span>
           </Link>
 

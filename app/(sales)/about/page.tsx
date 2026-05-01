@@ -9,7 +9,7 @@ export default function AboutPage() {
         
 
         <div className="text-center mb-16">
-          <h1 className="text-5xl font-bold tracking-tight mb-6">About Metis Talent</h1>
+          <h1 className="text-5xl font-bold tracking-tight mb-6">About Metis</h1>
           <p className="text-2xl text-muted-foreground max-w-3xl mx-auto">
             Building better hiring through science and technology
           </p>

@@ -76,7 +76,7 @@ export default function Home() {
                 Built for modern hiring teams
               </h2>
               <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                Two powerful, science-backed assessments in one platform.
+                Two powerful, science-backed assessments for rapid evaluation.
               </p>
             </div>
 
@@ -130,7 +130,7 @@ export default function Home() {
                     </div>
                     <h3 className="text-3xl font-bold mb-6 text-foreground">1. Invite Candidates</h3>
                     <p className="text-lg text-muted-foreground leading-relaxed">
-                      Quickly add candidates and automatically send personalized assessment links.
+                      Quickly add candidates and automatically send secure assessment links.
                     </p>
                   </div>
                   <div className="bg-muted/50 rounded-2xl p-8 shadow-inner">

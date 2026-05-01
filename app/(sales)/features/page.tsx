@@ -62,39 +62,9 @@ export default function FeaturesPage() {
             </CardContent>
           </Card>
 
+          
+
           {/* Feature 3 */}
-          <Card className="border-none shadow-lg hover:shadow-xl transition-all duration-300">
-            <CardHeader>
-              <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
-                <Clock className="h-8 w-8 text-primary" />
-              </div>
-              <CardTitle className="text-2xl">Timed &amp; Untimed Options</CardTitle>
-            </CardHeader>
-            <CardContent className="text-muted-foreground">
-              <p>
-                Choose between timed assessments for roles requiring quick thinking under pressure, 
-                or untimed versions for deeper personality insights.
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Feature 4 */}
-          <Card className="border-none shadow-lg hover:shadow-xl transition-all duration-300">
-            <CardHeader>
-              <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
-                <Target className="h-8 w-8 text-primary" />
-              </div>
-              <CardTitle className="text-2xl">Role-Specific Insights</CardTitle>
-            </CardHeader>
-            <CardContent className="text-muted-foreground">
-              <p>
-                Get tailored recommendations for different roles — from engineering and sales to 
-                leadership and customer support.
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Feature 5 */}
           <Card className="border-none shadow-lg hover:shadow-xl transition-all duration-300">
             <CardHeader>
               <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
@@ -103,28 +73,22 @@ export default function FeaturesPage() {
               <CardTitle className="text-2xl">Performance Prediction</CardTitle>
             </CardHeader>
             <CardContent className="text-muted-foreground">
-              <p>
+              <p className='mb-4'>
                 Our weighted overall score helps predict on-the-job success by combining cognitive 
-                ability with key personality traits.
+                ability with key personality traits. This allows you to rapidly: 
+                
+                
               </p>
+              <ul className="space-y-2 text-sm">
+                    <li>• Predict job performance</li>
+                    <li>• See competence beyond the resume</li>
+                    <li>• Understand a candidate's workstyle</li>
+                    
+              </ul>
             </CardContent>
           </Card>
 
-          {/* Feature 6 */}
-          <Card className="border-none shadow-lg hover:shadow-xl transition-all duration-300">
-            <CardHeader>
-              <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
-                <Shield className="h-8 w-8 text-primary" />
-              </div>
-              <CardTitle className="text-2xl">Secure &amp; Compliant</CardTitle>
-            </CardHeader>
-            <CardContent className="text-muted-foreground">
-              <p>
-                SOC 2 compliant platform with enterprise-grade security. Candidate data is handled 
-                with strict privacy controls and consent management.
-              </p>
-            </CardContent>
-          </Card>
+          
         </div>
 
         {/* CTA Section */}
