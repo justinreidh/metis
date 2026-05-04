@@ -58,7 +58,7 @@ export default function Home() {
               </div>
               <div>
                 <div className="text-4xl font-bold text-primary">Unlimited</div>
-                <p className="text-muted-foreground mt-2">Candidates and assessments</p>
+                <p className="text-muted-foreground mt-2">Candidate assessments</p>
               </div>
               <div>
                 <div className="text-4xl font-bold text-primary">24/7</div>
