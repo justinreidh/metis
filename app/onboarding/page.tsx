@@ -47,14 +47,17 @@ export default function OnboardingPage() {
         }),
       })
 
-      if (!response.ok) throw new Error('Failed to create checkout session')
+      const data = await response.json()
 
-      const { clientSecret: secret } = await response.json()
-      setClientSecret(secret)
+        if (!response.ok) {
+        throw new Error(data.error || 'Failed to create checkout session')
+        }
 
-    } catch (err) {
+        setClientSecret(data.clientSecret)
+
+    } catch (err: any) {
       console.error(err)
-      alert('Error starting your free trial. Please try again.')
+      alert(err.message)
     } finally {
       setLoading(false)
     }
@@ -124,7 +127,7 @@ export default function OnboardingPage() {
           </Button>
 
           <p className="text-center text-sm text-muted-foreground">
-            After 7 days, you'll be charged $99/month. You can cancel anytime before then.
+            After 7 days, you'll be charged $49/month. You can cancel anytime before then.
           </p>
         </CardContent>
       </Card>

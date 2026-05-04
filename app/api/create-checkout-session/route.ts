@@ -1,33 +1,73 @@
 // app/api/create-embedded-checkout/route.ts
-import { stripe } from '@/lib/stripe';
-import { createClient } from '@/lib/supabase/server';
-import { NextResponse } from 'next/server';
-import { createOrGetCustomer } from '@/lib/stripe';
-import { supabaseAdmin } from '@/lib/supabase/admin';
+import { stripe } from '@/lib/stripe'
+import { createClient } from '@/lib/supabase/server'
+import { NextResponse } from 'next/server'
+import { createOrGetCustomer } from '@/lib/stripe'
 
 export async function POST(request: Request) {
-  const { userId, email } = await request.json();
+  try {
+    const { userId, email } = await request.json()
+    const supabase = await createClient()
 
-  const supabase = await createClient();
-  const customerId = await createOrGetCustomer(userId, email);
+    // Check current subscription status
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('subscription_status')
+      .eq('id', userId)
+      .single()
 
-  const session = await stripe.checkout.sessions.create({
-    customer_email: email,
-    mode: 'subscription',
-    payment_method_types: ['card'],
-    line_items: [
-      {
-        price: 'price_1T9yFuEcPdjGva3Es26Oz16k', // e.g. price_1ABC...
-        quantity: 1,
-      },
-    ],
-    ui_mode: 'embedded',                    // ← Key for Embedded Checkout
-    return_url: `${process.env.NEXT_PUBLIC_SITE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-    subscription_data: {
+    if (error) {
+      console.error('Error fetching profile:', error)
+      return NextResponse.json(
+        { error: 'Could not verify subscription status' },
+        { status: 500 }
+      )
+    }
+
+    // Prevent duplicate subscriptions / free trials
+    if (
+      profile?.subscription_status === 'active' ||
+      profile?.subscription_status === 'trialing'
+    ) {
+      return NextResponse.json(
+        { error: 'You already have an active subscription.' },
+        { status: 400 }
+      )
+    }
+
+    // Create or fetch Stripe customer
+    const customerId = await createOrGetCustomer(userId, email)
+
+    // Create embedded checkout session
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId, // use existing Stripe customer
+      mode: 'subscription',
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price: 'price_1TTBfHEcPdjGva3E0XekCSXo',
+          quantity: 1,
+        },
+      ],
+      ui_mode: 'embedded',
+      return_url: `${process.env.NEXT_PUBLIC_SITE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      subscription_data: {
         trial_period_days: 7,
-    },
-    metadata: { user_id: userId },
-  });
+      },
+      metadata: {
+        user_id: userId,
+      },
+    })
 
-  return NextResponse.json({ clientSecret: session.client_secret });
+    return NextResponse.json({
+      clientSecret: session.client_secret,
+    })
+  } catch (error) {
+    console.error('Checkout session error:', error)
+
+    return NextResponse.json(
+      { error: 'Failed to create checkout session' },
+      { status: 500 }
+    )
+  }
 }
