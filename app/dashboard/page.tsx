@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import { Plus, Users, Trophy, TrendingUp, Clock, AlertCircle } from 'lucide-react'
+import CandidateItem from '@/components/CandidateItem'
 
 export default function DashboardOverview() {
   const [stats, setStats] = useState({
@@ -273,33 +274,12 @@ export default function DashboardOverview() {
               <p className="text-center py-12 text-muted-foreground">No candidates yet. Add your first one to get started.</p>
             ) : (
               <div className="space-y-4">
-                {recentCandidates.map((c) => {
-                  const score = c.results?.[0]?.overall_score
-                  return (
-                    <div
-                      key={c.id}
-                      className="flex flex-col sm:flex-row sm:items-center justify-between p-5 bg-card border border-border rounded-2xl hover:border-primary/30 transition-colors"
-                    >
-                      <div>
-                        <div className="font-medium">{c.name}</div>
-                        <div className="text-sm text-muted-foreground">{c.email}</div>
-                      </div>
-
-                      <div className="flex items-center gap-6 mt-4 sm:mt-0">
-                        {score !== undefined && (
-                          <div className="text-right">
-                            <div className="text-xl font-bold">{score}</div>
-                            <div className="text-xs text-muted-foreground">Score</div>
-                          </div>
-                        )}
-
-                        <Button variant="ghost" size="sm" asChild>
-                          <Link href={`/dashboard/candidate/${c.id}`}>View Details</Link>
-                        </Button>
-                      </div>
-                    </div>
-                  )
-                })}
+                {recentCandidates.map((candidate) => (
+                    <CandidateItem
+                    key={candidate.id}
+                    candidate={candidate}
+                    />
+                ))}
               </div>
             )}
           </CardContent>

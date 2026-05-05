@@ -129,7 +129,7 @@ export default function CandidatesPage() {
                 <CandidateItem
                     key={candidate.id}
                     candidate={candidate}
-                    onCopyLink={generateLink}
+                    
                 />
                 ))}
               </div>

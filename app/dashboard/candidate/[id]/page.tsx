@@ -14,6 +14,9 @@ import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { ArrowLeft, AlertCircle, Trophy } from 'lucide-react'
 import { HIGH_PERFORMER_BENCHMARKS } from '@/lib/constants'
+import MetricInfo from '@/components/MetricInfo'
+import CandidateDeepAnalysis from '@/components/CandidateDeepAnalysis'
+import PersonalityTraitBlock from '@/components/PersonalityTraitBlock'
 
 interface CandidatePageProps {
   params: Promise<{ id: string }>
@@ -107,26 +110,129 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
               </div>
             ) : (
               <div className="space-y-12">
-                {/* Overall Score - Prominent Section */}
+                {/* Overall Percentile Section */}
                 <div className="bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 rounded-2xl p-10 text-center">
-                  <div className="flex justify-center mb-6">
-                    <div className="inline-flex items-center justify-center w-24 h-24 bg-background rounded-full shadow">
-                      <Trophy className="h-12 w-12 text-primary" />
-                    </div>
-                  </div>
-                  
-                  <p className="uppercase tracking-widest text-primary text-sm font-medium mb-2">
-                    Overall Candidate Score
-                  </p>
-                  <div className="text-7xl font-bold text-foreground tracking-tighter">
+                <p className="uppercase tracking-widest text-primary text-sm font-medium mb-3">
+                    Overall Candidate Percentile:
+                </p>
+
+                <div
+                    className={`text-7xl font-bold tracking-tighter ${
+                    result.overall_score >= 75
+                        ? 'text-green-600'
+                        : result.overall_score >= 50
+                        ? 'text-yellow-600'
+                        : 'text-red-600'
+                    }`}
+                >
                     {result.overall_score}
-                    <span className="text-4xl font-normal text-muted-foreground">/100</span>
-                  </div>
-                  <p className="mt-4 text-muted-foreground max-w-md mx-auto">
-                    This score combines cognitive ability and key personality traits, 
-                    weighted toward the strongest predictors of job performance.
-                  </p>
+                    
                 </div>
+
+                <p className="mt-6 text-muted-foreground">
+                    Percentile relative to broader candidate population
+                </p>
+
+                <div className="mt-6 max-w-2xl mx-auto">
+                    {result.overall_score >= 75 ? (
+                    <p className="text-muted-foreground leading-relaxed">
+                        This candidate appears <span className="font-medium text-foreground">highly competitive</span>{' '}
+                        relative to the broader candidate pool. Strong performance suggests above-average
+                        cognitive ability and personality alignment on traits commonly associated with job
+                        success, including conscientiousness, emotional stability, and interpersonal fit.
+                    </p>
+                    ) : result.overall_score >= 50 ? (
+                    <p className="text-muted-foreground leading-relaxed">
+                        This candidate appears <span className="font-medium text-foreground">above average</span>{' '}
+                        overall and may be a strong potential hire depending on role requirements.
+                        Results suggest a reasonably solid balance of cognitive ability and workplace-relevant
+                        personality traits.
+                    </p>
+                    ) : (
+                    <p className="text-muted-foreground leading-relaxed">
+                        This candidate may be <span className="font-medium text-foreground">less competitive</span>{' '}
+                        relative to the broader pool. Lower results can indicate weaker alignment on one or
+                        more predictive dimensions such as cognitive ability, conscientiousness, or emotional
+                        stability, and may warrant additional review.
+                    </p>
+                    )}
+                </div>
+                </div>
+
+
+                {/* Top Predictors Summary */}
+                <div className="grid md:grid-cols-3 gap-6">
+                {[
+                    {
+                    title: 'General Cognitive Ability',
+                    value: result.gca_percentile,
+                    description:
+                        'Measures reasoning ability, learning speed, and problem-solving.',
+                    },
+                    {
+                    title: 'Conscientiousness',
+                    value: Math.round(
+                        result.personality_percentiles?.conscientiousness ?? 0
+                    ),
+                    description:
+                        'Strong predictor of reliability, discipline, and follow-through.',
+                    },
+                    {
+                    title: 'Emotional Stability',
+                    value: Math.round(
+                        result.personality_percentiles?.emotional_stability ?? 0
+                    ),
+                    description:
+                        'Reflects resilience, composure, and performance under stress.',
+                    },
+                ].map((metric) => {
+                    const colorClass =
+                    metric.value >= 75
+                        ? 'text-blue-500'
+                        : metric.value >= 50
+                        ? 'text-yellow-600'
+                        : 'text-red-600'
+
+                    const summary =
+                    metric.value >= 75
+                        ? 'Strong'
+                        : metric.value >= 50
+                        ? 'Above Average'
+                        : 'Needs Review'
+
+                    return (
+                    <Card key={metric.title} className="border shadow-sm">
+                        <CardHeader className="pb-3">
+                        <CardTitle className="text-base leading-snug">
+                            {metric.title}
+                        </CardTitle>
+                        <CardDescription className="text-xs">
+                            {metric.description}
+                        </CardDescription>
+                        </CardHeader>
+
+                        <CardContent>
+                        <div className={`text-3xl font-bold ${colorClass}`}>
+                            {metric.value}
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-2">
+                            {summary}
+                        </p>
+                        </CardContent>
+                    </Card>
+                    )
+                })}
+                </div>
+
+                <CandidateDeepAnalysis
+                name={candidate.name}
+                gca={result.gca_percentile}
+                conscientiousness={result.personality_percentiles.conscientiousness}
+                emotional_stability={result.personality_percentiles.emotional_stability}
+                agreeableness={result.personality_percentiles.agreeableness}
+                extraversion={result.personality_percentiles.extraversion}
+                openness={result.personality_percentiles.openness}
+                />
 
             
 
@@ -134,7 +240,12 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
 
                 {/* GCA Section */}
                 <div>
-                  <h3 className="text-xl font-semibold mb-6 text-foreground">General Cognitive Ability (GCA)</h3>
+                  <h3 className="text-xl font-semibold mb-6 text-foreground">
+                    <MetricInfo
+                        label="General Cognitive Ability (GCA)"
+                        description="Measures reasoning ability, problem solving, pattern recognition, and learning speed. General cognitive ability is one of the strongest predictors of job performance across roles."
+                    />
+                    </h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div>
                       <p className="text-sm text-muted-foreground">Raw Score</p>
@@ -171,52 +282,32 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
 
                 {/* Personality Section */}
                 <div>
-                  <h3 className="text-xl font-semibold mb-6 text-foreground">Big Five Personality Traits</h3>
+                  <h3 className="text-xl font-semibold mb-6 text-foreground">Big Five Personality Results</h3>
                   <div className="space-y-10">
                     {Object.entries(result.personality_percentiles || {}).map(([traitKey, percentileValue]) => {
-                      const trait = traitKey as keyof typeof HIGH_PERFORMER_BENCHMARKS.personality
-                      const benchmark = HIGH_PERFORMER_BENCHMARKS.personality[trait]
-                      const score = typeof percentileValue === 'number' ? Math.round(percentileValue) : null
-                      const raw = result.personality_scores?.[trait] ?? null
+                        const trait = traitKey as keyof typeof HIGH_PERFORMER_BENCHMARKS.personality
+                        const benchmark = HIGH_PERFORMER_BENCHMARKS.personality[trait]
+                        const score = typeof percentileValue === 'number' ? Math.round(percentileValue) : null
 
-                      if (!benchmark || score === null) return null
+                        if (!benchmark || score === null) return null
 
-                      return (
-                        <div key={trait} className="space-y-4">
-                          <div className="flex justify-between items-baseline">
-                            <h4 className="font-medium text-lg capitalize text-foreground">
-                              {trait.replace('_', ' ')}
-                            </h4>
-                            <div className="text-right">
-                              <span className="text-3xl font-bold text-foreground">{score}%</span>
-                              
-                            </div>
-                          </div>
-
-                          <div>
-                            <p className="text-sm text-muted-foreground mb-2">
-                              High Performer Benchmark: {benchmark.min}–{benchmark.max}% (ideal ~{benchmark.ideal})
-                            </p>
-                            <div className="relative h-4 bg-muted rounded-full overflow-hidden">
-                              <div
-                                className="absolute h-4 bg-primary rounded-full transition-all"
-                                style={{ width: `${score}%` }}
-                              />
-                              <div
-                                className="absolute top-0 h-4 w-1.5 bg-yellow-500 shadow"
-                                style={{ left: `${benchmark.ideal}%` }}
-                              />
-                            </div>
-                            <div className="flex justify-between text-xs text-muted-foreground mt-1.5">
-                              <span>Low</span>
-                              
-                              <span>High</span>
-                            </div>
-                          </div>
-                        </div>
-                      )
+                        return (
+                        <PersonalityTraitBlock
+                            key={trait}
+                            trait={trait}
+                            score={score}
+                            benchmark={benchmark}
+                            description={{
+                            conscientiousness: 'Reflects organization, discipline, reliability, and follow-through. Often the strongest personality predictor of job performance.', 
+                            emotional_stability: 'Measures resilience to stress, emotional regulation, and consistency under pressure.', 
+                            agreeableness: 'Captures cooperativeness, empathy, trust, and interpersonal harmony.', 
+                            extraversion: 'Reflects sociability, assertiveness, energy, and comfort with interpersonal engagement.', 
+                            intellect_imagination: 'Measures curiosity, creativity, adaptability, and receptiveness to new ideas.',
+                            }[trait] || 'Personality trait measured by assessment.'}
+                        />
+                        )
                     })}
-                  </div>
+                    </div>
                 </div>
 
                 <div className="pt-6 text-sm text-muted-foreground italic border-t border-border">
