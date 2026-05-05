@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Eye, Copy, Search, Plus, Trophy } from 'lucide-react'
 import Link from 'next/link'
+import CandidateItem from '@/components/CandidateItem'
 
 export default function CandidatesPage() {
   const [candidates, setCandidates] = useState<any[]>([])
@@ -124,55 +125,13 @@ export default function CandidatesPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {filteredCandidates.map((c) => {
-                  const overallScore = c.results?.[0]?.overall_score
-                  const hasScore = overallScore !== null && overallScore !== undefined
-
-                  return (
-                    <div
-                      key={c.id}
-                      className="flex flex-col sm:flex-row sm:items-center justify-between p-6 bg-card border border-border rounded-2xl hover:border-primary/30 hover:shadow-md transition-all"
-                    >
-                      <div className="mb-4 sm:mb-0">
-                        <div className="font-semibold text-lg text-foreground">{c.name}</div>
-                        <div className="text-sm text-muted-foreground">{c.email}</div>
-                      </div>
-
-                      <div className="flex flex-wrap items-center gap-4">
-                        <Badge 
-                          variant={c.status === 'completed' ? 'default' : c.status === 'in_progress' ? 'secondary' : 'outline'}
-                        >
-                          {c.status ? c.status.replace('_', ' ') : 'Pending'}
-                        </Badge>
-
-                        {hasScore && (
-                          <div className="flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full font-medium">
-                            <Trophy className="h-4 w-4" />
-                            {overallScore}/100
-                          </div>
-                        )}
-
-                        {!hasScore && (
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={() => generateLink(c.id)}
-                          >
-                            <Copy className="h-4 w-4 mr-2" />
-                            Copy Link
-                          </Button>
-                        )}
-
-                        <Button variant="ghost" size="sm" asChild>
-                          <a href={`/dashboard/candidate/${c.id}`}>
-                            <Eye className="h-4 w-4 mr-2" />
-                            View Details
-                          </a>
-                        </Button>
-                      </div>
-                    </div>
-                  )
-                })}
+                {filteredCandidates.map((candidate) => (
+                <CandidateItem
+                    key={candidate.id}
+                    candidate={candidate}
+                    onCopyLink={generateLink}
+                />
+                ))}
               </div>
             )}
           </CardContent>
