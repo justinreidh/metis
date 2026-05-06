@@ -7,10 +7,7 @@ export default function PrivacyPage() {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
       <div className="container mx-auto px-6 py-12 max-w-4xl">
         {/* Back Button */}
-        <Button variant="ghost" size="sm" className="mb-8" asChild>
-          <Link href="/">← Back to Home</Link>
-        </Button>
-
+        
         <div className="prose prose-gray max-w-none">
           <h1 className="text-4xl font-bold tracking-tight mb-8">Privacy Policy</h1>
           

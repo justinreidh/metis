@@ -47,7 +47,7 @@ export default function ContactPage() {
               href="tel:+15551234567" 
               className="text-primary hover:underline text-lg font-medium"
             >
-              (555) 123-4567
+              (720) 270-3220
             </a>
             <p className="text-sm text-muted-foreground mt-4">
               Monday – Friday, 9am – 5pm MST
@@ -57,12 +57,7 @@ export default function ContactPage() {
           
         </div>
 
-        <div className="mt-16 text-center">
-          <p className="text-muted-foreground">
-            Prefer to talk? Feel free to reach out via email or phone. 
-            We're here to help you find better talent.
-          </p>
-        </div>
+        
       </div>
     </div>
   )
