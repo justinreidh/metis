@@ -105,7 +105,7 @@ export default function DashboardOverview() {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
       <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div className="mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
+          <h1 className="text-4xl font-bold tracking-tight text-foreground">
             Welcome back
           </h1>
           <p className="text-xl text-muted-foreground mt-3">

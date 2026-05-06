@@ -1,4 +1,3 @@
-// app/dashboard/add/page.tsx
 'use client'
 
 import { useState } from 'react'
@@ -9,7 +8,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { ArrowLeft, Loader2, Plus, AlertCircle } from 'lucide-react'
+import { Plus, Loader2, AlertCircle } from 'lucide-react'
+import Link from 'next/link'
 
 export default function AddCandidatePage() {
   const [name, setName] = useState('')
@@ -44,15 +44,12 @@ export default function AddCandidatePage() {
       if (insertError) throw insertError
 
       setSuccess(true)
-      
-      // Reset form
       setName('')
       setEmail('')
 
-      // Redirect back to dashboard after short delay
       setTimeout(() => {
-        router.push('/dashboard')
-      }, 1500)
+        router.push('/dashboard/candidates')
+      }, 1200)
 
     } catch (err: any) {
       setError(err.message || 'Failed to add candidate')
@@ -63,39 +60,48 @@ export default function AddCandidatePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
-      <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8 max-w-2xl">
-        {/* Back Button */}
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="mb-8 text-primary hover:text-primary/80" 
-          onClick={() => router.push('/dashboard')}
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Dashboard
-        </Button>
+      <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
 
+        {/* Header (matches Candidates page style) */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+          <div>
+            <h1 className="text-4xl font-bold tracking-tight text-foreground">
+              Add Candidate
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              Invite a new candidate to take your assessment
+            </p>
+          </div>
+
+          
+        </div>
+
+        {/* Form Card (same structure as Candidates page card) */}
         <Card className="border-none shadow-xl">
-          <CardHeader className="pb-8">
-            <CardTitle className="text-3xl">Add New Candidate</CardTitle>
-            <CardDescription className="text-lg">
-              Invite a candidate to take the assessment. We'll send them a secure link.
+          <CardHeader>
+            <CardTitle>Candidate Details</CardTitle>
+            <CardDescription>
+              Enter the candidate’s information below. We’ll generate their assessment link automatically.
             </CardDescription>
           </CardHeader>
 
           <CardContent>
             {success ? (
-              <div className="py-12 text-center">
-                <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
-                  <Plus className="h-10 w-10 text-green-600" />
+              <div className="py-16 text-center">
+                <div className="mx-auto w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+                  <Plus className="h-7 w-7 text-primary" />
                 </div>
-                <h3 className="text-2xl font-semibold mb-3">Candidate Added Successfully</h3>
+                <h3 className="text-2xl font-semibold mb-2">
+                  Candidate Added
+                </h3>
                 <p className="text-muted-foreground">
-                  The candidate has been added and can now be invited to take the assessment.
+                  Redirecting to candidates list...
                 </p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-8">
+
+                {/* Name */}
                 <div className="space-y-2">
                   <Label htmlFor="name">Full Name</Label>
                   <Input
@@ -105,10 +111,11 @@ export default function AddCandidatePage() {
                     placeholder="Alex Rivera"
                     required
                     disabled={loading}
-                    className="text-lg py-6"
+                    className="py-6 text-lg"
                   />
                 </div>
 
+                {/* Email */}
                 <div className="space-y-2">
                   <Label htmlFor="email">Email Address</Label>
                   <Input
@@ -119,10 +126,11 @@ export default function AddCandidatePage() {
                     placeholder="alex@company.com"
                     required
                     disabled={loading}
-                    className="text-lg py-6"
+                    className="py-6 text-lg"
                   />
                 </div>
 
+                {/* Error */}
                 {error && (
                   <Alert variant="destructive">
                     <AlertCircle className="h-4 w-4" />
@@ -131,9 +139,10 @@ export default function AddCandidatePage() {
                   </Alert>
                 )}
 
-                <Button 
-                  type="submit" 
-                  className="w-full py-7 text-lg"
+                {/* Submit */}
+                <Button
+                  type="submit"
+                  className="w-full py-6 text-lg"
                   disabled={loading || !name || !email}
                 >
                   {loading ? (
@@ -147,14 +156,11 @@ export default function AddCandidatePage() {
                     </>
                   )}
                 </Button>
+
               </form>
             )}
           </CardContent>
         </Card>
-
-        <p className="text-center text-sm text-muted-foreground mt-8">
-          The candidate will receive an email with a secure link to complete the assessment.
-        </p>
       </div>
     </div>
   )

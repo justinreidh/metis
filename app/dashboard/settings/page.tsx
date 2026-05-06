@@ -109,13 +109,13 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="mb-10">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
+      <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <h1 className="text-4xl font-bold tracking-tight">Settings</h1>
         <p className="text-muted-foreground mt-2">Manage your account and organization preferences</p>
       </div>
 
-      <Tabs defaultValue="profile" className="w-full">
+      <Tabs defaultValue="profile" className="w-full px-4 sm:px-6 lg:px-8">
         <TabsList className="mb-10 grid w-full grid-cols-3">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="company">Company</TabsTrigger>
