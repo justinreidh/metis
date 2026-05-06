@@ -60,7 +60,7 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
         {/* Candidate Name + Personal Info Inline */}
         <div className="mb-12">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
-            Assessment Result
+            Candidate Result
           </h1>
           
           
@@ -71,7 +71,7 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
         {/* Assessment Results */}
         <Card className="border-none shadow-xl">
           <CardHeader className="pb-6">
-            <CardTitle className="text-2xl">{candidate.name}'s Assessment Result</CardTitle>
+            <CardTitle className="text-2xl">{candidate.name}'s Assessment Scores</CardTitle>
             <CardDescription>
               <div className="mt-4 flex flex-wrap gap-x-8 gap-y-3 text-sm">
             <div>
