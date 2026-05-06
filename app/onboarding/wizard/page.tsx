@@ -10,6 +10,7 @@ import { Progress } from '@/components/ui/progress'
 import { CheckCircle, Users, Send, BarChart3, ArrowRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import Link from 'next/link';
 
 export default function GetStartedWizard() {
   const [step, setStep] = useState(1)
@@ -160,7 +161,14 @@ export default function GetStartedWizard() {
         </Card>
 
         <p className="text-center text-sm text-muted-foreground mt-8">
-          Step {step} of {totalSteps} • You can skip this anytime
+            Step {step} of {totalSteps} • You can{' '}
+            <a 
+                href="/dashboard" 
+                className="hover:underline text-primary font-medium"
+            >
+                skip
+            </a>{' '}
+            this anytime
         </p>
       </div>
     </div>
