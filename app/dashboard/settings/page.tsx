@@ -15,17 +15,21 @@ type Profile = {
   last_name: string
   company_name: string
   subscription_status: string
+  trial_ends_at: string | null
+  next_invoice_at: string | null
 }
 
 export default function SettingsPage() {
   const supabase = createClient()
 
   const [profile, setProfile] = useState<Profile>({
-    first_name: '',
-    last_name: '',
-    company_name: '',
-    subscription_status: '',
-  })
+  first_name: '',
+  last_name: '',
+  company_name: '',
+  subscription_status: '',
+  trial_ends_at: null,
+  next_invoice_at: null,
+})
 
   const [email, setEmail] = useState<string>('')
   const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null)
@@ -49,16 +53,25 @@ export default function SettingsPage() {
 
         // Fetch profile
         const { data: profileData } = await supabase
-          .from('profiles')
-          .select('first_name, last_name, company_name, subscription_status')
-          .eq('id', user.id)
-          .single()
+        .from('profiles')
+        .select(`
+            first_name,
+            last_name,
+            company_name,
+            subscription_status,
+            trial_ends_at,
+            next_invoice_at
+        `)
+        .eq('id', user.id)
+        .single()
 
         setProfile({
-          first_name: profileData?.first_name ?? '',
-          last_name: profileData?.last_name ?? '',
-          company_name: profileData?.company_name ?? '',
-          subscription_status: profileData?.subscription_status ?? '',
+            first_name: profileData?.first_name ?? '',
+            last_name: profileData?.last_name ?? '',
+            company_name: profileData?.company_name ?? '',
+            subscription_status: profileData?.subscription_status ?? '',
+            trial_ends_at: profileData?.trial_ends_at ?? null,
+            next_invoice_at: profileData?.next_invoice_at ?? null,
         })
 
         
@@ -107,6 +120,16 @@ export default function SettingsPage() {
   if (error) {
     return <div className="max-w-4xl mx-auto p-8 text-red-500">{error}</div>
   }
+
+  const formatDate = (dateString: string | null) => {
+  if (!dateString) return 'N/A'
+
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
@@ -206,6 +229,26 @@ export default function SettingsPage() {
                 </Badge>
               </div>
             
+
+              <div className="space-y-4">
+                {profile.subscription_status === 'trialing' && profile.trial_ends_at && (
+                    <div className="p-4 border rounded-xl bg-muted/30">
+                    <p className="font-medium">Free Trial Ends</p>
+                    <p className="text-muted-foreground">
+                        {formatDate(profile.trial_ends_at)}
+                    </p>
+                    </div>
+                )}
+
+                {profile.next_invoice_at && (
+                    <div className="p-4 border rounded-xl bg-muted/30">
+                    <p className="font-medium">Next Billing Date</p>
+                    <p className="text-muted-foreground">
+                        {formatDate(profile.next_invoice_at)}
+                    </p>
+                    </div>
+                )}
+              </div>
 
               <div className="flex gap-4">
                 <Button variant="outline">Manage Subscription</Button>
