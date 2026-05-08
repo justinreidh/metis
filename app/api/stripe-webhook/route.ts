@@ -78,11 +78,14 @@ async function updateProfileWithSubscription(
 ) {
   const trialEndsAt = subscription.trial_end
     ? new Date(subscription.trial_end * 1000).toISOString()
-    : null;
+    : null
 
-  const nextInvoiceAt = subscription.items?.data?.[0]?.current_period_end
-    ? new Date(subscription.items.data[0].current_period_end * 1000).toISOString()
-    : null;
+  const nextInvoiceAt =
+    subscription.items?.data?.[0]?.current_period_end
+      ? new Date(
+          subscription.items.data[0].current_period_end * 1000
+        ).toISOString()
+      : null
 
   await supabaseAdmin
     .from('profiles')
@@ -91,8 +94,9 @@ async function updateProfileWithSubscription(
       subscription_status: subscription.status,
       trial_ends_at: trialEndsAt,
       next_invoice_at: nextInvoiceAt,
+      cancel_at_period_end: subscription.cancel_at_period_end,
     })
-    .eq('id', userId);
+    .eq('id', userId)
 }
 
 async function handleInvoicePaid(invoice: Stripe.Invoice) {
