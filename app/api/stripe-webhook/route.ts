@@ -72,20 +72,28 @@ export async function POST(req: Request) {
 
 // ====================== HELPERS ======================
 
+// ====================== HELPERS ======================
+
 async function updateProfileWithSubscription(
   userId: string,
   subscription: Stripe.Subscription
 ) {
   const trialEndsAt = subscription.trial_end
     ? new Date(subscription.trial_end * 1000).toISOString()
-    : null
+    : null;
 
-  const nextInvoiceAt =
-    subscription.items?.data?.[0]?.current_period_end
-      ? new Date(
-          subscription.items.data[0].current_period_end * 1000
-        ).toISOString()
-      : null
+  const nextInvoiceAt = subscription.items?.data?.[0]?.current_period_end
+    ? new Date(subscription.items.data[0].current_period_end * 1000).toISOString()
+    : null;
+
+  // NEW: Handle cancellation during trial or at period end
+  const cancelAt = subscription.cancel_at
+    ? new Date(subscription.cancel_at * 1000).toISOString()
+    : null;
+
+  const isCanceledAtPeriodEnd = 
+    subscription.cancel_at_period_end || 
+    !!subscription.cancel_at; // Important for trial cancellations
 
   await supabaseAdmin
     .from('profiles')
@@ -94,9 +102,13 @@ async function updateProfileWithSubscription(
       subscription_status: subscription.status,
       trial_ends_at: trialEndsAt,
       next_invoice_at: nextInvoiceAt,
-      cancel_at_period_end: subscription.cancel_at_period_end,
+      cancel_at_period_end: isCanceledAtPeriodEnd,
+      cancel_at: cancelAt,                    // New column (optional but recommended)
+      canceled_at: subscription.canceled_at 
+        ? new Date(subscription.canceled_at * 1000).toISOString()
+        : null,
     })
-    .eq('id', userId)
+    .eq('id', userId);
 }
 
 async function handleInvoicePaid(invoice: Stripe.Invoice) {

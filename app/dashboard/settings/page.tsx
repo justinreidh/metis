@@ -23,7 +23,7 @@ type Profile = {
   subscription_status: string
   trial_ends_at: string | null
   next_invoice_at: string | null
-  cancel_at_period_end: boolean
+  cancel_at: string | null
 }
 
 export default function SettingsPage() {
@@ -36,7 +36,7 @@ export default function SettingsPage() {
     subscription_status: '',
     trial_ends_at: null,
     next_invoice_at: null,
-    cancel_at_period_end: false,
+    cancel_at: null,
   })
 
   const [email, setEmail] = useState('')
@@ -70,7 +70,7 @@ export default function SettingsPage() {
             subscription_status,
             trial_ends_at,
             next_invoice_at,
-            cancel_at_period_end
+            cancel_at
           `)
           .eq('id', user.id)
           .single()
@@ -84,7 +84,7 @@ export default function SettingsPage() {
           subscription_status: profileData?.subscription_status ?? '',
           trial_ends_at: profileData?.trial_ends_at ?? null,
           next_invoice_at: profileData?.next_invoice_at ?? null,
-          cancel_at_period_end: profileData?.cancel_at_period_end ?? false,
+          cancel_at: profileData?.cancel_at ?? null,
         })
       } catch (err: any) {
         console.error(err)
@@ -169,7 +169,7 @@ export default function SettingsPage() {
 
   const showNextBillingDate =
     !!profile.next_invoice_at &&
-    !profile.cancel_at_period_end &&
+    !profile.cancel_at &&
     profile.subscription_status !== 'canceled'
 
   return (
@@ -272,81 +272,107 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="billing">
-          <Card className="border-none shadow-xl">
-            <CardHeader>
-              <CardTitle>Billing & Subscription</CardTitle>
-              <CardDescription>
-                Manage your plan and payment method
-              </CardDescription>
-            </CardHeader>
+            <Card className="border-none shadow-xl">
+                <CardHeader>
+                <CardTitle>Billing & Subscription</CardTitle>
+                <CardDescription>
+                    Manage your plan and payment method
+                </CardDescription>
+                </CardHeader>
 
-            <CardContent className="space-y-6">
-              <div className="flex justify-between items-center p-6 border rounded-2xl bg-card">
-                <div>
-                  <p className="font-medium text-lg">Professional Plan</p>
-                  <p className="text-muted-foreground">
-                    $99/month • Billed monthly
-                  </p>
+                <CardContent className="space-y-6">
+                {/* Current Plan */}
+                <div className="flex justify-between items-center p-6 border rounded-2xl bg-card">
+                    <div>
+                    <p className="font-medium text-lg">Professional Plan</p>
+                    <p className="text-muted-foreground">$99/month • Billed monthly</p>
+                    </div>
+
+                    <Badge
+                    variant={
+                        profile.subscription_status === 'active' || 
+                        profile.subscription_status === 'trialing'
+                        ? 'default'
+                        : 'secondary'
+                    }
+                    >
+                    {profile.subscription_status
+                        ? profile.subscription_status.charAt(0).toUpperCase() + 
+                        profile.subscription_status.slice(1)
+                        : 'Inactive'}
+                    </Badge>
                 </div>
 
-                <Badge
-                  variant={
-                    profile.subscription_status === 'active'
-                      ? 'default'
-                      : 'secondary'
-                  }
-                >
-                  {profile.subscription_status
-                    ? profile.subscription_status.charAt(0).toUpperCase() +
-                      profile.subscription_status.slice(1)
-                    : 'Inactive'}
-                </Badge>
-              </div>
-
-              <div className="space-y-4">
-                {profile.subscription_status === 'trialing' &&
-                  profile.trial_ends_at && (
-                    <div className="p-4 border rounded-xl bg-muted/30">
-                      <p className="font-medium">Free Trial Ends</p>
-                      <p className="text-muted-foreground">
-                        {formatDate(profile.trial_ends_at)}
-                      </p>
+                {/* Status Messages */}
+                <div className="space-y-4">
+                    {/* Active Free Trial (Not canceled) */}
+                    {profile.subscription_status === 'trialing' && 
+                    profile.trial_ends_at && 
+                    !profile.cancel_at && (
+                    <div className="p-5 border rounded-xl bg-blue-50 dark:bg-blue-950/30 border-blue-200">
+                        <p className="font-medium text-blue-700 dark:text-blue-300">Free Trial Active</p>
+                        <p className="text-muted-foreground mt-1">
+                        Your free trial ends on{' '}
+                        <span className="font-medium">{formatDate(profile.trial_ends_at)}</span>
+                        </p>
                     </div>
-                  )}
+                    )}
 
-                {profile.cancel_at_period_end &&
-                  profile.trial_ends_at && (
-                    <div className="p-4 border rounded-xl bg-yellow-50">
-                      <p className="font-medium">Trial Canceled</p>
-                      <p className="text-muted-foreground">
+                    {/* Trial Canceled */}
+                    {profile.subscription_status === 'trialing' && 
+                    profile.cancel_at && (
+                    <div className="p-5 border rounded-xl bg-yellow-50 dark:bg-yellow-950/30 border-yellow-200">
+                        <p className="font-medium text-yellow-700 dark:text-yellow-300">Trial Canceled</p>
+                        <p className="text-muted-foreground mt-1">
                         Your free trial will end on{' '}
-                        {formatDate(profile.trial_ends_at)}.
-                        You will not be billed.
-                      </p>
+                        <span className="font-medium text-foreground">
+                            {formatDate(profile.cancel_at || profile.trial_ends_at)}
+                        </span>
+                        . You will not be charged.
+                        </p>
                     </div>
-                  )}
+                    )}
 
-                {showNextBillingDate && (
-                  <div className="p-4 border rounded-xl bg-muted/30">
-                    <p className="font-medium">Next Billing Date</p>
-                    <p className="text-muted-foreground">
-                      {formatDate(profile.next_invoice_at)}
-                    </p>
-                  </div>
+                    {/* Active Subscription - Canceled */}
+                    {profile.subscription_status === 'active' && profile.cancel_at && (
+                    <div className="p-5 border rounded-xl bg-amber-50 dark:bg-amber-950/30 border-amber-200">
+                        <p className="font-medium text-amber-700 dark:text-amber-300">Cancellation Scheduled</p>
+                        <p className="text-muted-foreground mt-1">
+                        Your subscription will end on{' '}
+                        <span className="font-medium">
+                            {formatDate(profile.cancel_at)}
+                        </span>
+                        </p>
+                    </div>
+                    )}
+
+                    {/* Next Billing Date - Only show if NOT canceled */}
+                    {!!profile.next_invoice_at && 
+                    !profile.cancel_at && 
+                    profile.subscription_status !== 'canceled' && (
+                    <div className="p-5 border rounded-xl bg-muted/30">
+                        <p className="font-medium">Next Billing Date</p>
+                        <p className="text-muted-foreground">
+                        {formatDate(profile.next_invoice_at)}
+                        </p>
+                    </div>
+                    )}
+                </div>
+
+                {/* Manage Subscription Button */}
+                {(profile.subscription_status === 'active' || 
+                    profile.subscription_status === 'trialing') && (
+                    <Button
+                    variant="outline"
+                    onClick={handleManageSubscription}
+                    className="w-full sm:w-auto"
+                    >
+                    Manage Subscription
+                    </Button>
                 )}
-              </div>
-
-              {profile.subscription_status !== 'inactive' && (
-                <Button
-                  variant="outline"
-                  onClick={handleManageSubscription}
-                >
-                  Manage Subscription
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+                </CardContent>
+            </Card>
+            </TabsContent>
       </Tabs>
     </div>
   )
