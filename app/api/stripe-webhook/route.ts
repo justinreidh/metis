@@ -25,47 +25,63 @@ export async function POST(req: Request) {
 
   switch (event.type) {
     case 'checkout.session.completed':
-      const session = event.data.object as Stripe.Checkout.Session;
-      const userId = session.metadata?.user_id;
+        const session = event.data.object as Stripe.Checkout.Session;
+        const checkoutUserId = session.metadata?.user_id;   // ← renamed
 
-      if (userId && typeof session.subscription === 'string') {
+        if (checkoutUserId && typeof session.subscription === 'string') {
         const subscription = await stripe.subscriptions.retrieve(session.subscription);
-        await updateProfileWithSubscription(userId, subscription);
-      }
-      break;
+        await updateProfileWithSubscription(checkoutUserId, subscription);
+        }
+        break;
 
-    
     case 'customer.subscription.updated':
-      const subscriptionObj = event.data.object as Stripe.Subscription;
-      const subUserId = subscriptionObj.metadata?.user_id;
+        const subscriptionObj = event.data.object as Stripe.Subscription;
+        
+        let userId = subscriptionObj.metadata?.user_id;
 
-      if (subUserId) {
-        await updateProfileWithSubscription(subUserId, subscriptionObj);
-      }
-      break;
+        if (!userId && subscriptionObj.customer) {
+            try {
+            if (typeof subscriptionObj.customer === 'string') {
+                const customer = await stripe.customers.retrieve(subscriptionObj.customer);
+                if (customer && 'metadata' in customer && !('deleted' in customer)) {
+                userId = (customer as Stripe.Customer).metadata?.user_id;
+                }
+            } else if ('metadata' in subscriptionObj.customer) {
+                userId = (subscriptionObj.customer as Stripe.Customer).metadata?.user_id;
+            }
+            } catch (e) {
+            console.error('Failed to fetch customer for subscription update:', e);
+            }
+        }
+
+        if (userId) {
+            const subscription = await stripe.subscriptions.retrieve(subscriptionObj.id);
+            await updateProfileWithSubscription(userId, subscription);
+        }
+        break;
 
     case 'invoice.paid':
-      const invoice = event.data.object as Stripe.Invoice;
-      await handleInvoicePaid(invoice);
-      break;
+        const invoice = event.data.object as Stripe.Invoice;
+        await handleInvoicePaid(invoice);
+        break;
 
     case 'invoice.payment_failed':
-      const failedInvoice = event.data.object as Stripe.Invoice;
-      await handleInvoiceFailed(failedInvoice);
-      break;
+        const failedInvoice = event.data.object as Stripe.Invoice;
+        await handleInvoiceFailed(failedInvoice);
+        break;
 
     case 'customer.subscription.deleted':
-      const deletedSub = event.data.object as Stripe.Subscription;
-      await supabaseAdmin
+        const deletedSub = event.data.object as Stripe.Subscription;
+        await supabaseAdmin
         .from('profiles')
         .update({
-          subscription_status: 'canceled',
-          trial_ends_at: null,
-          next_invoice_at: null,
+            subscription_status: 'canceled',
+            trial_ends_at: null,
+            next_invoice_at: null,
         })
         .eq('subscription_id', deletedSub.id);
-      break;
-  }
+        break;
+    }
 
   return NextResponse.json({ received: true }, { status: 200 });
 }
