@@ -31,6 +31,8 @@ export const supabaseAdmin = createClient(
 //  - Creates customer in Stripe if needed
 //  - Upserts stripe_customer_id + email into users
 // ────────────────────────────────────────────────
+// lib/stripe.ts
+
 export async function createOrGetCustomer(userId: string, email: string): Promise<string> {
   try {
     // 1. Look for existing customer ID
@@ -49,37 +51,33 @@ export async function createOrGetCustomer(userId: string, email: string): Promis
       return userRecord.stripe_customer_id;
     }
 
-    // 2. No customer → create one in Stripe
+    // 2. Create new customer with consistent metadata
     const customer = await stripe.customers.create({
       email,
       metadata: {
-        supabase_user_id: userId,
+        user_id: userId,           // ← Changed from supabase_user_id
       },
     });
 
-    // 3. Upsert into Supabase users table (bypassing RLS via admin client)
+    // 3. Upsert into Supabase
     const { error: upsertError } = await supabaseAdmin
       .from('profiles')
       .upsert(
         {
           id: userId,
           stripe_customer_id: customer.id,
-          // You can add more defaults if desired, e.g.:
-          // subscription_status: 'inactive',
-          // updated_at: new Date().toISOString(),
         },
         { onConflict: 'id' }
       );
 
     if (upsertError) {
       console.error('Failed to upsert user with customer ID:', upsertError);
-      // Optional: rollback Stripe customer if critical (rarely needed)
       throw new Error(`Failed to save customer ID: ${upsertError.message}`);
     }
 
     return customer.id;
   } catch (err) {
     console.error('createOrGetCustomer failed:', err);
-    throw err; // let the caller handle (e.g. return 500)
+    throw err;
   }
 }

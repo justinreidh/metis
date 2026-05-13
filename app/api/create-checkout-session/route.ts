@@ -53,6 +53,9 @@ export async function POST(request: Request) {
       return_url: `${process.env.NEXT_PUBLIC_SITE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       subscription_data: {
         trial_period_days: 7,
+        metadata: {
+          user_id: userId,           // ← Extra safety
+        },
       },
       metadata: {
         user_id: userId,
