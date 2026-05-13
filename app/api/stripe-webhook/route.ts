@@ -37,38 +37,31 @@ export async function POST(req: Request) {
     case 'customer.subscription.updated':
         const subscriptionObj = event.data.object as Stripe.Subscription;
         
-        console.log(`🔄 Subscription updated: ${subscriptionObj.id}`);
-        console.log(`   Status: ${subscriptionObj.status}`);
-        console.log(`   cancel_at_period_end: ${subscriptionObj.cancel_at_period_end}`);
-        console.log(`   cancel_at: ${subscriptionObj.cancel_at}`);
-        console.log(`   canceled_at: ${subscriptionObj.canceled_at}`);
-        console.log(`   Metadata user_id: ${subscriptionObj.metadata?.user_id}`);
+        
 
         let userId = subscriptionObj.metadata?.user_id;
 
         if (!userId && subscriptionObj.customer) {
             try {
-            console.log(`   → Fetching customer metadata as fallback...`);
+            
             const customer = typeof subscriptionObj.customer === 'string'
                 ? await stripe.customers.retrieve(subscriptionObj.customer)
                 : subscriptionObj.customer;
 
             if (customer && 'metadata' in customer && !('deleted' in customer)) {
                 userId = (customer as Stripe.Customer).metadata?.user_id;
-                console.log(`   → Found user_id in customer: ${userId}`);
+                
             }
             } catch (e) {
-            console.error('Failed to fetch customer:', e);
+            
             }
         }
 
         if (userId) {
-            console.log(`✅ Found userId: ${userId}. Updating profile...`);
+            
             const subscription = await stripe.subscriptions.retrieve(subscriptionObj.id);
             await updateProfileWithSubscription(userId, subscription);
-            console.log(`✅ updateProfileWithSubscription called for user ${userId}`);
         } else {
-            console.error(`❌ No userId found for subscription ${subscriptionObj.id}`);
         }
         break;
 
@@ -106,7 +99,6 @@ async function updateProfileWithSubscription(
   userId: string,
   subscription: Stripe.Subscription
 ) {
-    console.log(`💾 Updating Supabase for user ${userId} | status=${subscription.status} | cancel_at=${subscription.cancel_at}`);
   const trialEndsAt = subscription.trial_end
     ? new Date(subscription.trial_end * 1000).toISOString()
     : null;
