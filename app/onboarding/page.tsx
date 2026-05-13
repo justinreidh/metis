@@ -105,7 +105,6 @@ export default function OnboardingPage() {
             <div className="flex gap-4">
               <div className="text-2xl">✅</div>
               <div>
-                <p className="font-medium">No credit card required upfront</p>
                 <p className="text-sm text-muted-foreground">You'll only be charged after the trial ends</p>
               </div>
             </div>
@@ -127,7 +126,7 @@ export default function OnboardingPage() {
           </Button>
 
           <p className="text-center text-sm text-muted-foreground">
-            After 7 days, you'll be charged $49/month. You can cancel anytime before then.
+            After 7 days, you'll be charged $149/month. You can cancel anytime before then.
           </p>
         </CardContent>
       </Card>

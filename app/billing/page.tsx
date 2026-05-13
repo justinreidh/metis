@@ -63,7 +63,7 @@ export default function Billing() {
       <Card>
         <CardHeader>
           <CardTitle>Upgrade to Premium</CardTitle>
-          <CardDescription>Unlock candidate invites and result viewing for $10/month.</CardDescription>
+          <CardDescription>Unlock candidate invites and result viewing for $149/month.</CardDescription>
         </CardHeader>
         <CardContent>
         
