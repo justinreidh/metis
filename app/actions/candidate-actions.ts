@@ -31,16 +31,12 @@ export async function createCandidateWithEmail({
     if (insertError) throw insertError
 
     // 2. Generate secure token
-    const token = crypto.randomUUID()
+    
 
     // 3. Save assessment token
-    await supabaseAdmin.from('assessment_tokens').insert({
-      candidate_id: candidate.id,
-      token,
-      expires_at: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days
-    })
+    
 
-    const assessmentUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/assessment/${token}`
+    const assessmentUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/test/?token=${candidate.token}`
 
     // 4. Send email
     await resend.emails.send({
