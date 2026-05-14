@@ -44,7 +44,7 @@ export async function createCandidateWithEmail({
 
     // 4. Send email
     await resend.emails.send({
-      from: 'Support <no-replay@ymetisassessments.com>', // ← Change to your verified domain
+      from: 'Support <no-reply@ymetisassessments.com>', // ← Change to your verified domain
       to: email,
       subject: `Assessment Invitation - ${name}`,
       react: AssessmentInvite({
