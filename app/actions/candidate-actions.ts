@@ -37,20 +37,20 @@ export async function createCandidateWithEmail({
     await supabaseAdmin.from('assessment_tokens').insert({
       candidate_id: candidate.id,
       token,
-      expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+      expires_at: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days
     })
 
     const assessmentUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/assessment/${token}`
 
     // 4. Send email
     await resend.emails.send({
-      from: 'Your Company <hiring@yourdomain.com>', // ← Change to your verified domain
+      from: 'Support <no-replay@ymetisassessments.com>', // ← Change to your verified domain
       to: email,
       subject: `Assessment Invitation - ${name}`,
       react: AssessmentInvite({
         candidateName: name,
         assessmentUrl,
-        companyName: "Your Company",
+        companyName: "Metis Assessments",
       }),
     })
 
