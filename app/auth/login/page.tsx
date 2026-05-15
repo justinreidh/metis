@@ -1,7 +1,8 @@
-// app/login/page.tsx
 'use client'
 
-import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,30 +11,47 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
+import { loginSchema } from '@/lib/validations/auth'
+
+// Zod Validation Schema for Login
+
+
+type LoginForm = z.infer<typeof loginSchema>
 
 export default function Login() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [generalError, setGeneralError] = useState<string | null>(null)
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<LoginForm>({
+    resolver: zodResolver(loginSchema),
+    mode: 'onBlur',
+  })
+
+  const onSubmit = async (data: LoginForm) => {
+    setGeneralError(null)
     setLoading(true)
 
     try {
       const supabase = createClient()
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
       })
 
       if (error) throw error
 
+      // Redirect on successful login
       window.location.href = '/dashboard'
     } catch (err: any) {
-      setError(err.message || 'Invalid email or password')
+      console.error(err)
+      setGeneralError(err.message || 'Invalid email or password')
     } finally {
       setLoading(false)
     }
@@ -57,7 +75,7 @@ export default function Login() {
           </CardHeader>
 
           <CardContent>
-            <form onSubmit={handleLogin} className="space-y-5">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               {/* Email Field */}
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
@@ -67,13 +85,14 @@ export default function Login() {
                     id="email"
                     type="email"
                     placeholder="name@company.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
+                    {...register('email')}
                     className="pl-10"
                     disabled={loading}
                   />
                 </div>
+                {errors.email && (
+                  <p className="text-sm text-destructive">{errors.email.message}</p>
+                )}
               </div>
 
               {/* Password Field */}
@@ -93,21 +112,22 @@ export default function Login() {
                     id="password"
                     type="password"
                     placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
+                    {...register('password')}
                     className="pl-10"
                     disabled={loading}
                   />
                 </div>
+                {errors.password && (
+                  <p className="text-sm text-destructive">{errors.password.message}</p>
+                )}
               </div>
 
-              {/* Error Message */}
-              {error && (
+              {/* General Error */}
+              {generalError && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
                   <AlertTitle>Login failed</AlertTitle>
-                  <AlertDescription>{error}</AlertDescription>
+                  <AlertDescription>{generalError}</AlertDescription>
                 </Alert>
               )}
 

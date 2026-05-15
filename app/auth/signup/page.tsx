@@ -1,6 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,37 +11,49 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Mail, Lock, ArrowRight, AlertCircle, User, Building } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
+import { signupSchema } from '@/lib/validations/auth'
+// Zod Validation Schema
+
+
+type SignupForm = z.infer<typeof signupSchema>
 
 export default function Signup() {
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [email, setEmail] = useState('')
-  const [companyName, setCompanyName] = useState('')
-  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
+  const [generalError, setGeneralError] = useState<string | null>(null)
 
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setError: setFormError,
+  } = useForm<SignupForm>({
+    resolver: zodResolver(signupSchema),
+    mode: 'onBlur', // Validates on blur for better UX
+  })
+
+  const onSubmit = async (data: SignupForm) => {
+    setGeneralError(null)
     setMessage(null)
     setLoading(true)
 
     try {
       const supabase = createClient()
 
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
+      const cleanCompanyName = data.companyName?.trim() || null
+
+      const { error } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
         options: {
           emailRedirectTo: `${window.location.origin}/onboarding`,
-          // Pass user metadata (first_name, last_name, company_name)
           data: {
-            first_name: firstName.trim(),
-            last_name: lastName.trim(),
-            company_name: companyName.trim() || null,
-            full_name: `${firstName.trim()} ${lastName.trim()}`.trim(),
+            first_name: data.firstName.trim(),
+            last_name: data.lastName.trim(),
+            company_name: cleanCompanyName,
+            full_name: `${data.firstName.trim()} ${data.lastName.trim()}`.trim(),
           },
         },
       })
@@ -47,15 +61,10 @@ export default function Signup() {
       if (error) throw error
 
       setMessage('Check your email for the confirmation link! (Check spam folder if not received)')
-      
-      // Clear form
-      setFirstName('')
-      setLastName('')
-      setEmail('')
-      setCompanyName('')
-      setPassword('')
+      reset() // Clear the form
     } catch (err: any) {
-      setError(err.message || 'An error occurred during signup')
+      console.error(err)
+      setGeneralError(err.message || 'An error occurred during signup')
     } finally {
       setLoading(false)
     }
@@ -79,7 +88,7 @@ export default function Signup() {
           </CardHeader>
 
           <CardContent>
-            <form onSubmit={handleSignup} className="space-y-5">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               {/* First Name */}
               <div className="space-y-2">
                 <Label htmlFor="firstName">First Name</Label>
@@ -87,15 +96,15 @@ export default function Signup() {
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="firstName"
-                    type="text"
                     placeholder="John"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    required
+                    {...register('firstName')}
                     className="pl-10"
                     disabled={loading}
                   />
                 </div>
+                {errors.firstName && (
+                  <p className="text-sm text-destructive">{errors.firstName.message}</p>
+                )}
               </div>
 
               {/* Last Name */}
@@ -105,18 +114,18 @@ export default function Signup() {
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="lastName"
-                    type="text"
                     placeholder="Doe"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    required
+                    {...register('lastName')}
                     className="pl-10"
                     disabled={loading}
                   />
                 </div>
+                {errors.lastName && (
+                  <p className="text-sm text-destructive">{errors.lastName.message}</p>
+                )}
               </div>
 
-              {/* Email Field */}
+              {/* Email */}
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <div className="relative">
@@ -125,33 +134,37 @@ export default function Signup() {
                     id="email"
                     type="email"
                     placeholder="name@company.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
+                    {...register('email')}
                     className="pl-10"
                     disabled={loading}
                   />
                 </div>
+                {errors.email && (
+                  <p className="text-sm text-destructive">{errors.email.message}</p>
+                )}
               </div>
 
-              {/* Company Name (Optional) */}
+              {/* Company Name */}
               <div className="space-y-2">
-                <Label htmlFor="companyName">Company Name <span className="text-muted-foreground">(optional)</span></Label>
+                <Label htmlFor="companyName">
+                  Company Name <span className="text-muted-foreground">(optional)</span>
+                </Label>
                 <div className="relative">
                   <Building className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="companyName"
-                    type="text"
                     placeholder="Acme Corp"
-                    value={companyName}
-                    onChange={(e) => setCompanyName(e.target.value)}
+                    {...register('companyName')}
                     className="pl-10"
                     disabled={loading}
                   />
                 </div>
+                {errors.companyName && (
+                  <p className="text-sm text-destructive">{errors.companyName.message}</p>
+                )}
               </div>
 
-              {/* Password Field */}
+              {/* Password */}
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
@@ -160,25 +173,23 @@ export default function Signup() {
                     id="password"
                     type="password"
                     placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    minLength={6}
+                    {...register('password')}
                     className="pl-10"
                     disabled={loading}
                   />
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Minimum 6 characters
-                </p>
+                <p className="text-xs text-muted-foreground">Minimum 8 characters with uppercase, lowercase, and number</p>
+                {errors.password && (
+                  <p className="text-sm text-destructive">{errors.password.message}</p>
+                )}
               </div>
 
-              {/* Error Message */}
-              {error && (
+              {/* General Error */}
+              {generalError && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
                   <AlertTitle>Error</AlertTitle>
-                  <AlertDescription>{error}</AlertDescription>
+                  <AlertDescription>{generalError}</AlertDescription>
                 </Alert>
               )}
 
